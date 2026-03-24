@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structurely — Sales Compensation & Pricing Model</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0c1220 0%, #0f172a 40%, #0e1525 100%);
+            color: #e2e8f0;
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            padding: 32px 24px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { margin-bottom: 32px; }
+        .header-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .header-accent { width: 8px; height: 32px; background: linear-gradient(180deg, #38bdf8, #0ea5e9); border-radius: 4px; }
+        .header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+        .header p { color: #64748b; font-size: 14px; padding-left: 20px; }
+        .section-label { font-size: 13px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+        .card { background: rgba(15,23,42,0.6); border: 1px solid rgba(100,140,180,0.2); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+        .grid-6 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; gap: 12px; }
+        .input-label { font-size: 10px; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+        .input-wrap { display: flex; align-items: center; background: rgba(30,41,59,0.8); border-radius: 6px; border: 1px solid rgba(100,140,180,0.15); padding: 6px 10px; }
+        .input-wrap input { background: transparent; border: none; color: #e2e8f0; font-size: 14px; font-weight: 600; width: 100%; outline: none; font-family: 'JetBrains Mono', monospace; }
+        .input-wrap input.accent { color: #38bdf8; }
+        .input-prefix { color: #64748b; font-size: 13px; margin-right: 2px; }
+        .input-suffix { color: #64748b; font-size: 12px; margin-left: 2px; }
+        .tier-card { margin-bottom: 12px; }
+        .tier-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .tier-name { font-size: 16px; font-weight: 700; }
+        .tier-mrr { font-size: 24px; font-weight: 800; color: #38bdf8; }
+        .tier-mrr-label { font-size: 10px; color: #64748b; }
+        .metric-row { display: flex; gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(100,140,180,0.1); flex-wrap: wrap; }
+        .metric-item { text-align: center; min-width: 80px; }
+        .metric-label { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .metric-value { font-size: 14px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .summary-box { background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); border-radius: 10px; padding: 20px; text-align: center; }
+        .summary-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .summary-value { font-size: 32px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+        .summary-sub { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+        .funnel-visual { display: flex; align-items: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+        .funnel-stage { text-align: center; flex: 1; min-width: 100px; }
+        .funnel-stage-label { font-size: 10px; color: #64748b; }
+        .funnel-stage-value { font-size: 18px; font-weight: 700; color: #38bdf8; }
+        .funnel-arrow { color: #475569; font-size: 18px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead tr { border-bottom: 2px solid rgba(100,140,180,0.2); }
+        th { padding: 8px 10px; text-align: right; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px; }
+        th:first-child { text-align: left; }
+        td { padding: 10px; text-align: right; font-family: 'JetBrains Mono', monospace; color: #e2e8f0; }
+        td:first-child { text-align: left; font-family: 'DM Sans', sans-serif; font-weight: 600; }
+        tbody tr { border-bottom: 1px solid rgba(100,140,180,0.08); }
+        tr.highlight { background: rgba(56,189,248,0.08); }
+        .green { color: #4ade80; }
+        .yellow { color: #fbbf24; }
+        .red { color: #f87171; }
+        .orange { color: #fb923c; }
+        .sky { color: #38bdf8; }
+        .muted { color: #94a3b8; }
+        .bold { font-weight: 700; }
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; }
+        .alert-success { background: rgba(74,222,128,0.15); border: 1px solid rgba(74,222,128,0.3); color: #4ade80; }
+        .alert-danger { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); color: #f87171; }
+        .footer { text-align: center; margin-top: 24px; font-size: 11px; color: #334155; }
+        .input-wrap:focus-within { border-color: rgba(56,189,248,0.5); box-shadow: 0 0 0 3px rgba(56,189,248,0.1); }
+        .input-wrap input:focus { color: #fff; }
+        .card:hover { border-color: rgba(100,140,180,0.35); }
+        .summary-box:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .tier-card:hover { border-color: rgba(56,189,248,0.3); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        .logo-text { font-size: 12px; font-weight: 600; color: #64748b; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+        @media (max-width: 768px) { .grid-2, .grid-3, .grid-4, .grid-6 { grid-template-columns: 1fr 1fr; } body { padding: 16px 12px; } }
+    </style>
+</head>
+<body>
+<div class="container" id="app"></div>
+<script>
+const state = {
+    salesComp: {
+        numAEs: 2,
+        aeBaseSalary: 70000,
+        aeCommissionOffset: 500,
+        croBaseSalary: 60000,
+        croArrPct: 5,
+        croArrThreshold: 2000000
+    },
+    funnel: {
+        discoveryCalls: 65,
+        discoveryToDemo: 50,
+        demoToContract: 25
+    },
+    tiers: [
+        { name: "Individual Producer", setupFee: 1500, platformFee: 99, platformStep: 100, usageFee: 0, usageStep: 100, churnPct: 5, description: "Solo LO, no CRM integration" },
+        { name: "Small Team (3-10)", setupFee: 2000, platformFee: 499, platformStep: 100, usageFee: 0, usageStep: 100, churnPct: 3, description: "Zapier integration, 3-10 producers" },
+        { name: "Large Team (10+)", setupFee: 2500, platformFee: 999, platformStep: 100, usageFee: 8999, usageStep: 1000, churnPct: 3, description: "Deep CRM integration, 10+ producers" }
+    ],
+    clientMix: [60, 30, 10],
+    targetExpenseRatio: 25
+};
+
+function fmt(n) {
+    if (n >= 1000000) return "$" + (n/1000000).toFixed(2) + "M";
+    if (n >= 10000) return "$" + (n/1000).toFixed(1) + "K";
+    return "$" + Math.round(n).toLocaleString("en-US");
+}
+function fmtPct(n) { return n.toFixed(1) + "%"; }
+function getTierMRR(t) { return (t.platformFee || 0) + (t.usageFee || 0); }
+function getTierCommission(t) { return Math.max(0, t.setupFee - state.salesComp.aeCommissionOffset); }
+
+// Calculate monthly contracts from funnel (THIS DRIVES EVERYTHING)
+function getMonthlyContracts() {
+    const { numAEs } = state.salesComp;
+    const { discoveryCalls, discoveryToDemo, demoToContract } = state.funnel;
+    const demosPerAE = discoveryCalls * (discoveryToDemo / 100);
+    const contractsPerAE = demosPerAE * (demoToContract / 100);
+    return contractsPerAE * numAEs;
+}
+
+function calculateBlendedMetrics() {
+    const totalMix = state.clientMix.reduce((a,b) => a+b, 0);
+    const norm = state.clientMix.map(c => totalMix > 0 ? c/totalMix : 1/state.tiers.length);
+    let blendedMRR = 0, blendedSetup = 0, blendedChurn = 0, blendedCommission = 0;
+    state.tiers.forEach((t, i) => {
+        blendedMRR += getTierMRR(t) * norm[i];
+        blendedSetup += t.setupFee * norm[i];
+        blendedChurn += t.churnPct * norm[i];
+        blendedCommission += getTierCommission(t) * norm[i];
+    });
+    return { blendedMRR, blendedSetup, blendedChurn, blendedCommission, norm };
+}
+
+function calculateAnnualMetrics(overrideMonthlyContracts) {
+    const { numAEs, aeBaseSalary, croBaseSalary, croArrPct, croArrThreshold } = state.salesComp;
+    const { blendedMRR, blendedSetup, blendedChurn, blendedCommission, norm } = calculateBlendedMetrics();
+    
+    // Monthly contracts from funnel OR override for scenario analysis
+    const monthlyContracts = overrideMonthlyContracts !== undefined ? overrideMonthlyContracts : getMonthlyContracts();
+    const annualContracts = monthlyContracts * 12;
+    const monthlyChurnRate = blendedChurn / 100;
+    
+    // Calculate active clients using cohort retention
+    let totalActiveClients = 0;
+    for (let month = 1; month <= 12; month++) {
+        const monthsActive = 13 - month;
+        const retention = Math.pow(1 - monthlyChurnRate, monthsActive);
+        totalActiveClients += monthlyContracts * retention;
+    }
+    
+    const endingMRR = totalActiveClients * blendedMRR;
+    const endingARR = endingMRR * 12;
+    const setupRevenue = annualContracts * blendedSetup;
+    
+    // Sales expense calculation
+    const aeBaseTotal = numAEs * aeBaseSalary;
+    const aeCommissionTotal = annualContracts * blendedCommission;
+    const aeTotalComp = aeBaseTotal + aeCommissionTotal;
+    
+    const arrAboveThreshold = Math.max(0, endingARR - croArrThreshold);
+    const croCommission = arrAboveThreshold * (croArrPct / 100);
+    const croTotalComp = croBaseSalary + croCommission;
+    
+    const totalSalesExpense = aeTotalComp + croTotalComp;
+    const expenseRatio = endingARR > 0 ? (totalSalesExpense / endingARR) * 100 : 0;
+    
+    // Per tier breakdown
+    const perTier = state.tiers.map((t, i) => {
+        const tierMRR = getTierMRR(t);
+        const tierMonthlyChurn = t.churnPct / 100;
+        let tierActiveClients = 0;
+        for (let month = 1; month <= 12; month++) {
+            tierActiveClients += (monthlyContracts * norm[i]) * Math.pow(1 - tierMonthlyChurn, 13 - month);
+        }
+        return {
+            name: t.name,
+            contracts: Math.round(annualContracts * norm[i]),
+            activeClients: Math.round(tierActiveClients),
+            mrr: tierMRR,
+            arr: tierActiveClients * tierMRR * 12,
+            commission: getTierCommission(t)
+        };
+    });
+    
+    return { 
+        monthlyContracts, 
+        annualContracts: Math.round(annualContracts), 
+        totalActiveClients: Math.round(totalActiveClients), 
+        endingMRR, endingARR, setupRevenue, 
+        aeBaseTotal, aeCommissionTotal, aeTotalComp, 
+        croTotalComp, totalSalesExpense, expenseRatio, 
+        perTier, blendedCommission 
+    };
+}
+
+function render() {
+    const app = document.getElementById("app");
+    const { numAEs } = state.salesComp;
+    const { discoveryCalls, discoveryToDemo, demoToContract } = state.funnel;
+    const metrics = calculateAnnualMetrics();
+    const { blendedMRR, blendedChurn, blendedCommission } = calculateBlendedMetrics();
+    
+    // Funnel calculations for display
+    const totalDiscovery = discoveryCalls * numAEs;
+    const totalDemos = totalDiscovery * (discoveryToDemo / 100);
+    const totalContracts = totalDemos * (demoToContract / 100);
+    
+    let html = `
+    <div class="header">
+        <div class="logo-text">Structurely</div>
+        <div class="header-bar"><div class="header-accent"></div><h1>Sales Compensation & Pricing Model</h1></div>
+        <p>Interactive scenario modeling — All funnel inputs drive expense calculations</p>
+    </div>`;
+    
+    if (metrics.expenseRatio <= state.targetExpenseRatio) {
+        html += `<div class="alert alert-success">✓ Current funnel achieves ${fmtPct(metrics.expenseRatio)} expense ratio — below ${state.targetExpenseRatio}% target</div>`;
+    } else {
+        html += `<div class="alert alert-danger">⚠ Current expense ratio ${fmtPct(metrics.expenseRatio)} exceeds ${state.targetExpenseRatio}% target</div>`;
+    }
+    
+    // Sales Funnel (NOW DRIVES CALCULATIONS)
+    html += `
+    <div class="section-label">Sales Conversion Funnel → Drives All Calculations</div>
+    <div class="card">
+        <div class="grid-4">
+            ${inputField("# of AEs", "salesComp.numAEs", numAEs)}
+            ${inputField("Discovery Calls/AE/Mo", "funnel.discoveryCalls", discoveryCalls)}
+            ${inputField("Discovery → Demo %", "funnel.discoveryToDemo", discoveryToDemo, "", "%", 5)}
+            ${inputField("Demo → Contract %", "funnel.demoToContract", demoToContract, "", "%", 5)}
+        </div>
+        <div class="funnel-visual">
+            <div class="funnel-stage"><div class="funnel-stage-label">Discovery Calls</div><div class="funnel-stage-value">${Math.round(totalDiscovery)}/mo</div></div>
+            <div class="funnel-arrow">→</div>
+            <div class="funnel-stage"><div class="funnel-stage-label">Demos</div><div class="funnel-stage-value">${Math.round(totalDemos)}/mo</div></div>
+            <div class="funnel-arrow">→</div>
+            <div class="funnel-stage"><div class="funnel-stage-label">Contracts Signed</div><div class="funnel-stage-value sky bold">${Math.round(totalContracts)}/mo</div></div>
+            <div class="funnel-arrow">→</div>
+            <div class="funnel-stage"><div class="funnel-stage-label">Annual Contracts</div><div class="funnel-stage-value green bold">${metrics.annualContracts}/yr</div></div>
+        </div>
+    </div>`;
+    
+    // Sales Compensation Structure
+    html += `
+    <div class="section-label">Sales Compensation Structure</div>
+    <div class="card">
+        <div class="grid-4">
+            ${inputField("AE Base Salary", "salesComp.aeBaseSalary", state.salesComp.aeBaseSalary, "$")}
+            ${inputField("Commission Offset", "salesComp.aeCommissionOffset", state.salesComp.aeCommissionOffset, "$")}
+            ${inputField("CRO Base Salary", "salesComp.croBaseSalary", state.salesComp.croBaseSalary, "$")}
+            ${inputField("Target Exp Ratio", "targetExpenseRatio", state.targetExpenseRatio, "", "%")}
+        </div>
+        <div class="grid-4" style="margin-top:12px">
+            ${inputField("CRO % of ARR", "salesComp.croArrPct", state.salesComp.croArrPct, "", "%")}
+            ${inputField("CRO ARR Threshold", "salesComp.croArrThreshold", state.salesComp.croArrThreshold, "$")}
+            <div><div class="input-label">Blended Commission</div><div class="input-wrap"><span class="input-prefix">$</span><input type="text" value="${Math.round(blendedCommission)}" disabled style="color:#38bdf8"></div></div>
+            <div></div>
+        </div>
+        <div style="margin-top:12px; padding:12px; background:rgba(30,41,59,0.5); border-radius:8px; font-size:12px; color:#94a3b8;">
+            <strong style="color:#e2e8f0">AE Commission:</strong> Setup Fee − $${state.salesComp.aeCommissionOffset}
+            <span style="margin-left:16px">|</span>
+            <span style="margin-left:16px">Individual: <strong style="color:#4ade80">$${getTierCommission(state.tiers[0])}</strong></span>
+            <span style="margin-left:12px">Small: <strong style="color:#4ade80">$${getTierCommission(state.tiers[1])}</strong></span>
+            <span style="margin-left:12px">Large: <strong style="color:#4ade80">$${getTierCommission(state.tiers[2])}</strong></span>
+        </div>
+        <div class="metric-row">
+            <div class="metric-item"><div class="metric-label">AE Base (Annual)</div><div class="metric-value">${fmt(metrics.aeBaseTotal)}</div></div>
+            <div class="metric-item"><div class="metric-label">AE Commission (Annual)</div><div class="metric-value orange">${fmt(metrics.aeCommissionTotal)}</div></div>
+            <div class="metric-item"><div class="metric-label">Total AE Comp</div><div class="metric-value">${fmt(metrics.aeTotalComp)}</div></div>
+            <div class="metric-item"><div class="metric-label">CRO Total Comp</div><div class="metric-value">${fmt(metrics.croTotalComp)}</div></div>
+            <div class="metric-item"><div class="metric-label">Total Sales Expense</div><div class="metric-value sky bold">${fmt(metrics.totalSalesExpense)}</div></div>
+        </div>
+    </div>`;
+    
+    // Pricing Tiers
+    html += `<div class="section-label">Pricing Tiers</div>`;
+    state.tiers.forEach((t, i) => {
+        const tierMRR = getTierMRR(t);
+        const tierARR = tierMRR * 12;
+        const tierCommission = getTierCommission(t);
+        // LTV = MRR × Average Lifetime (months) = MRR / Monthly Churn Rate
+        const avgLifetimeMonths = t.churnPct > 0 ? 1 / (t.churnPct / 100) : 0;
+        const ltv = tierMRR * avgLifetimeMonths;
+        html += `
+        <div class="card tier-card">
+            <div class="tier-header">
+                <div><div class="tier-name">${t.name}</div><div class="muted" style="font-size:12px">${t.description}</div></div>
+                <div style="text-align:right"><div class="tier-mrr">${fmt(tierMRR)}</div><div class="tier-mrr-label">MRR / CLIENT</div></div>
+            </div>
+            <div class="grid-6">
+                ${inputField("Setup Fee", "tiers."+i+".setupFee", t.setupFee, "$")}
+                ${inputField("Platform Fee", "tiers."+i+".platformFee", t.platformFee, "$", "", t.platformStep || 100)}
+                ${inputField("Usage Fee", "tiers."+i+".usageFee", t.usageFee, "$", "", t.usageStep || 100)}
+                ${inputField("Monthly Churn %", "tiers."+i+".churnPct", t.churnPct, "", "%", 0.5)}
+                ${inputField("Mix %", "clientMix."+i, state.clientMix[i], "", "%")}
+                <div><div class="input-label">AE Commission</div><div class="input-wrap"><span class="input-prefix">$</span><input type="text" value="${tierCommission}" disabled style="color:#4ade80"></div></div>
+            </div>
+            <div class="metric-row">
+                <div class="metric-item"><div class="metric-label">ARR/Client</div><div class="metric-value">${fmt(tierARR)}</div></div>
+                <div class="metric-item"><div class="metric-label">LTV</div><div class="metric-value sky">${fmt(ltv)}</div></div>
+                <div class="metric-item"><div class="metric-label">Contracts/Yr</div><div class="metric-value">${metrics.perTier[i].contracts}</div></div>
+                <div class="metric-item"><div class="metric-label">Active Clients</div><div class="metric-value">${metrics.perTier[i].activeClients}</div></div>
+                <div class="metric-item"><div class="metric-label">Tier ARR</div><div class="metric-value green">${fmt(metrics.perTier[i].arr)}</div></div>
+            </div>
+        </div>`;
+    });
+    
+    // Summary
+    html += `
+    <div class="section-label">Annual Summary</div>
+    <div class="card">
+        <div class="grid-3">
+            <div><div class="input-label">Blended MRR</div><div class="input-wrap"><span class="input-prefix">$</span><input type="text" value="${Math.round(blendedMRR)}" disabled style="color:#94a3b8"></div></div>
+            <div><div class="input-label">Blended Churn</div><div class="input-wrap"><input type="text" value="${blendedChurn.toFixed(1)}" disabled style="color:#94a3b8"><span class="input-suffix">%</span></div></div>
+            <div><div class="input-label">Monthly Contracts (from funnel)</div><div class="input-wrap"><input type="text" value="${Math.round(metrics.monthlyContracts)}" disabled style="color:#38bdf8"></div></div>
+        </div>
+    </div>
+    <div class="grid-4" style="margin-bottom:24px">
+        <div class="summary-box"><div class="summary-label">Ending ARR</div><div class="summary-value sky">${fmt(metrics.endingARR)}</div><div class="summary-sub">${metrics.totalActiveClients} active clients</div></div>
+        <div class="summary-box"><div class="summary-label">Total Sales Expense</div><div class="summary-value orange">${fmt(metrics.totalSalesExpense)}</div><div class="summary-sub">Year 1 cost</div></div>
+        <div class="summary-box"><div class="summary-label">Expense Ratio</div><div class="summary-value ${metrics.expenseRatio <= state.targetExpenseRatio ? 'green' : 'red'}">${fmtPct(metrics.expenseRatio)}</div><div class="summary-sub">Target: ${state.targetExpenseRatio}%</div></div>
+        <div class="summary-box"><div class="summary-label">Setup Revenue (Yr 1)</div><div class="summary-value muted">${fmt(metrics.setupRevenue)}</div><div class="summary-sub">One-time</div></div>
+    </div>`;
+    
+    // Monthly Contract Threshold Analysis
+    const thresholds = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24];
+    const currentMonthly = Math.round(metrics.monthlyContracts);
+    
+    html += `
+    <div class="section-label">Monthly Contract Threshold Analysis</div>
+    <div class="card">
+        <table>
+        <thead><tr>
+            <th style="text-align:left">Contracts/Mo</th>
+            <th>Annual Contracts</th>
+            <th>Active Clients (12mo)</th>
+            <th>ARR</th>
+            <th>Setup Revenue</th>
+            <th>Sales Expense</th>
+            <th>Expense Ratio</th>
+            <th>Net After Sales</th>
+        </tr></thead>
+        <tbody>`;
+    
+    thresholds.forEach(monthly => {
+        const m = calculateAnnualMetrics(monthly);
+        const netAfterSales = m.endingARR - m.totalSalesExpense;
+        const isCurrentLevel = monthly === currentMonthly;
+        html += `<tr${isCurrentLevel ? ' class="highlight"' : ''}>
+            <td style="text-align:left;font-weight:700;${isCurrentLevel ? 'color:#38bdf8' : ''}">${monthly}</td>
+            <td>${m.annualContracts}</td>
+            <td>${m.totalActiveClients}</td>
+            <td>${fmt(m.endingARR)}</td>
+            <td class="muted">${fmt(m.setupRevenue)}</td>
+            <td class="orange">${fmt(m.totalSalesExpense)}</td>
+            <td class="bold ${m.expenseRatio <= state.targetExpenseRatio ? 'green' : 'red'}">${fmtPct(m.expenseRatio)}</td>
+            <td class="bold ${netAfterSales > 0 ? 'green' : 'red'}">${fmt(netAfterSales)}</td>
+        </tr>`;
+    });
+    
+    html += `</tbody></table>
+    </div>`;
+    
+    html += `<div class="footer">Structurely Confidential — Q2 2026 Planning | Funnel inputs drive all calculations</div>`;
+    app.innerHTML = html;
+    attachListeners();
+}
+
+function inputField(label, field, value, prefix, suffix, step, cls) {
+    return `<div><div class="input-label">${label}</div><div class="input-wrap">${prefix ? '<span class="input-prefix">'+prefix+'</span>' : ''}<input type="number" data-field="${field}" value="${value}" step="${step||1}" class="${cls||''}">${suffix ? '<span class="input-suffix">'+suffix+'</span>' : ''}</div></div>`;
+}
+
+let pendingRender = false, lastFocusedField = null;
+
+function updateState(field, value) {
+    const path = field.split(".");
+    let val = parseFloat(value);
+    if (isNaN(val)) val = 0;
+    if (path.length === 2) {
+        if (path[0] === "clientMix") state.clientMix[parseInt(path[1])] = val;
+        else state[path[0]][path[1]] = val;
+    } else if (path.length === 3) {
+        state[path[0]][parseInt(path[1])][path[2]] = val;
+    } else {
+        state[path[0]] = val;
+    }
+    pendingRender = true;
+}
+
+function attachListeners() {
+    document.querySelectorAll("input[data-field]").forEach(el => {
+        el.addEventListener("focus", function() {
+            const currentField = this.dataset.field;
+            if (lastFocusedField && lastFocusedField !== currentField && pendingRender) {
+                pendingRender = false; render();
+                setTimeout(() => { const newEl = document.querySelector('input[data-field="'+currentField+'"]'); if (newEl) { newEl.focus(); newEl.select(); } }, 10);
+            } else { this.select(); }
+            lastFocusedField = currentField;
+        });
+        el.addEventListener("input", function() { updateState(this.dataset.field, this.value); });
+        el.addEventListener("blur", function() {
+            setTimeout(() => {
+                const activeEl = document.activeElement;
+                if (!(activeEl && activeEl.dataset && activeEl.dataset.field) && pendingRender) { pendingRender = false; lastFocusedField = null; render(); }
+            }, 50);
+        });
+        el.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault(); updateState(this.dataset.field, this.value);
+                const inputs = Array.from(document.querySelectorAll("input[data-field]")); const idx = inputs.indexOf(this);
+                pendingRender = false; render();
+                setTimeout(() => { const newInputs = Array.from(document.querySelectorAll("input[data-field]")); if (newInputs[idx + 1]) { newInputs[idx + 1].focus(); newInputs[idx + 1].select(); } }, 10);
+            }
+        });
+    });
+}
+
+render();
+</script>
+</body>
+</html>
