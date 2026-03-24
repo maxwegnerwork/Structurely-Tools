@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaaS Pricing Model — Conversational AI Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0c1220 0%, #0f172a 40%, #0e1525 100%);
+    color: #e2e8f0;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    padding: 32px 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* Header */
+  .header { margin-bottom: 32px; }
+  .header-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .header-accent { width: 8px; height: 32px; background: linear-gradient(180deg, #38bdf8, #0ea5e9); border-radius: 4px; }
+  .header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .header p { color: #64748b; font-size: 14px; padding-left: 20px; }
+
+  /* Section labels */
+  .section-label {
+    font-size: 13px; font-weight: 700; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px;
+  }
+
+  /* Tier cards */
+  .tier-card {
+    background: rgba(15,23,42,0.6);
+    border: 1px solid rgba(100,140,180,0.2);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(8px);
+  }
+  .tier-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .tier-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #64748b; font-weight: 600; margin-bottom: 4px; }
+  .tier-name { font-size: 17px; font-weight: 700; color: #e2e8f0; }
+  .tier-desc { font-size: 12px; color: #64748b; margin-top: 2px; }
+  .tier-mrr { font-size: 28px; font-weight: 800; color: #38bdf8; line-height: 1; text-align: right; }
+  .tier-mrr-label { font-size: 11px; color: #64748b; margin-top: 2px; text-align: right; }
+
+  /* Input grids */
+  .input-grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .input-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .input-grid-6 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; gap: 12px; }
+  .input-label { font-size: 10px; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .input-wrap {
+    display: flex; align-items: center;
+    background: rgba(30,41,59,0.8);
+    border-radius: 6px;
+    border: 1px solid rgba(100,140,180,0.15);
+    padding: 6px 10px;
+  }
+  .input-wrap input {
+    background: transparent; border: none; color: #e2e8f0;
+    font-size: 14px; font-weight: 600; width: 100%; outline: none;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .input-wrap input.accent { color: #38bdf8; }
+  .input-prefix { color: #64748b; font-size: 13px; margin-right: 2px; }
+  .input-suffix { color: #64748b; font-size: 12px; margin-left: 2px; }
+
+  /* Tier metrics row */
+  .tier-metrics {
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 8px; margin-top: 16px; padding-top: 12px;
+    border-top: 1px solid rgba(100,140,180,0.1);
+  }
+  .tier-metric { text-align: center; }
+  .tier-metric-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .tier-metric-value { font-size: 16px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+  /* Blended metrics */
+  .metrics-grid-5 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 12px; }
+  .metrics-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .metric-box {
+    background: rgba(15,23,42,0.5);
+    border: 1px solid rgba(100,140,180,0.15);
+    border-radius: 10px;
+    padding: 16px 20px;
+    text-align: center;
+  }
+  .metric-box-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 6px; }
+  .metric-box-value { font-size: 24px; font-weight: 800; font-family: 'JetBrains Mono', monospace; line-height: 1.1; }
+  .metric-box-sub { font-size: 11px; color: #475569; margin-top: 4px; }
+
+  /* Tables */
+  .table-wrap {
+    background: rgba(15,23,42,0.6);
+    border: 1px solid rgba(100,140,180,0.2);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    overflow-x: auto;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { border-bottom: 2px solid rgba(100,140,180,0.2); }
+  th {
+    padding: 8px 10px; text-align: right; color: #64748b;
+    font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.8px;
+  }
+  th:first-child { text-align: left; }
+  td {
+    padding: 10px; text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    color: #e2e8f0;
+  }
+  td:first-child { text-align: left; font-family: 'DM Sans', sans-serif; font-weight: 600; }
+  tbody tr { border-bottom: 1px solid rgba(100,140,180,0.08); }
+  tr.highlight { background: rgba(56,189,248,0.08); }
+  .table-note { font-size: 11px; color: #475569; margin-top: 12px; }
+
+  .green { color: #4ade80; }
+  .yellow { color: #fbbf24; }
+  .red { color: #f87171; }
+  .orange { color: #fb923c; }
+  .sky { color: #38bdf8; }
+  .muted { color: #94a3b8; }
+  .bold { font-weight: 700; }
+  .footer { text-align: center; margin-top: 24px; font-size: 11px; color: #334155; }
+
+  @media (max-width: 768px) {
+    .input-grid-4, .input-grid-6, .metrics-grid-5 { grid-template-columns: 1fr 1fr; }
+    .input-grid-3, .metrics-grid-3 { grid-template-columns: 1fr; }
+    .tier-metrics { grid-template-columns: 1fr 1fr 1fr; }
+    body { padding: 16px 12px; }
+    .tier-card { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container" id="app"></div>
+
+<script>
+// ─── Data ───
+const state = {
+  tiers: [
+    { name:"Solo LO — No CRM", setupFee:1000, monthlyPlatform:497, perUser:0, typicalUsers:1, salesCycleDays:14, salesCostPct:25, churnPct:5, description:"Individual loan officer, standalone platform, agent builder access" },
+    { name:"Solo LO — Zapier Integration", setupFee:1500, monthlyPlatform:697, perUser:0, typicalUsers:1, salesCycleDays:21, salesCostPct:25, churnPct:4, description:"Individual LO with Zapier-based CRM connection" },
+    { name:"Team — Deep CRM (FUB/Salesforce)", setupFee:2500, monthlyPlatform:997, perUser:97, typicalUsers:10, salesCycleDays:30, salesCostPct:20, churnPct:3, description:"10+ LO team with Follow-up Boss or Salesforce integration" },
+    { name:"Enterprise — Full Integration", setupFee:5000, monthlyPlatform:1997, perUser:79, typicalUsers:50, salesCycleDays:45, salesCostPct:15, churnPct:2, description:"25-100+ LOs, deep CRM, lead routing, custom workflows" }
+  ],
+  clientMix: [40, 25, 25, 10],
+  targetMRR: 100000,
+  fixedCosts: 35000
+};
+
+function fmt(n) {
+  if (n >= 1000000) return "$" + (n/1000000).toFixed(2) + "M";
+  if (n >= 10000) return "$" + (n/1000).toFixed(1) + "K";
+  return "$" + Math.round(n).toLocaleString("en-US");
+}
+function fmtPct(n) { return n.toFixed(1) + "%"; }
+
+function tierMRR(t) { return t.monthlyPlatform + (t.perUser * t.typicalUsers); }
+function tierARR(t) { return tierMRR(t) * 12; }
+function tierSalesExp(t) { return (tierARR(t) * t.salesCostPct) / 100; }
+function tierLTV(t) { return (tierMRR(t) * 12) / ((t.churnPct || 0.01) / 100); }
+function tierCAC(t) { return tierSalesExp(t) + t.setupFee * 0.3; }
+
+function colorLTVCAC(ratio) { return ratio >= 3 ? "green" : ratio >= 2 ? "yellow" : "red"; }
+function colorPayback(mo) { return mo <= 6 ? "green" : mo <= 12 ? "yellow" : "red"; }
+function colorSalesPct(pct) { return pct <= 25 ? "green" : "red"; }
+function colorMargin(v) { return v > 0 ? "green" : "red"; }
+
+// ─── Render ───
+function render() {
+  const app = document.getElementById("app");
+  let html = "";
+
+  // Header
+  html += `
+    <div class="header">
+      <div class="header-bar">
+        <div class="header-accent"></div>
+        <h1>SaaS Pricing Model</h1>
+      </div>
+      <p>Conversational AI Platform — Mortgage / RE / Home Services</p>
+    </div>
+  `;
+
+  // Tier cards
+  html += `<div class="section-label">Pricing Tiers — Edit All Fields</div>`;
+  state.tiers.forEach((t, i) => {
+    const mrr = tierMRR(t);
+    const arr = tierARR(t);
+    const sExp = tierSalesExp(t);
+    const netYr1 = arr + t.setupFee - sExp;
+    const ltv = tierLTV(t);
+    const cac = tierCAC(t);
+    const ltvCac = ltv / (cac || 1);
+    const payback = cac / (mrr || 1);
+
+    html += `
+    <div class="tier-card">
+      <div class="tier-top">
+        <div>
+          <div class="tier-label">Tier ${i+1}</div>
+          <div class="tier-name">${t.name}</div>
+          <div class="tier-desc">${t.description}</div>
+        </div>
+        <div>
+          <div class="tier-mrr">${fmt(mrr)}</div>
+          <div class="tier-mrr-label">MRR / client</div>
+        </div>
+      </div>
+      <div class="input-grid-4">
+        ${inputField("Setup Fee", "tiers."+i+".setupFee", t.setupFee, "$")}
+        ${inputField("Platform / mo", "tiers."+i+".monthlyPlatform", t.monthlyPlatform, "$")}
+        ${inputField("Per User / mo", "tiers."+i+".perUser", t.perUser, "$")}
+        ${inputField("Typical Users", "tiers."+i+".typicalUsers", t.typicalUsers)}
+      </div>
+      <div class="input-grid-3">
+        ${inputField("Sales Cost % ARR", "tiers."+i+".salesCostPct", t.salesCostPct, "", "%")}
+        ${inputField("Monthly Churn %", "tiers."+i+".churnPct", t.churnPct, "", "%", 0.5)}
+        ${inputField("Sales Cycle (days)", "tiers."+i+".salesCycleDays", t.salesCycleDays, "", "d")}
+      </div>
+      <div class="tier-metrics">
+        ${tierMetric("ARR / client", fmt(arr), "")}
+        ${tierMetric("Sales Expense", fmt(sExp), "orange")}
+        ${tierMetric("Net Yr 1 Rev", fmt(netYr1), netYr1 > 0 ? "green" : "red")}
+        ${tierMetric("LTV:CAC", ltvCac.toFixed(1)+"x", colorLTVCAC(ltvCac))}
+        ${tierMetric("CAC Payback", payback.toFixed(1)+" mo", colorPayback(payback))}
+      </div>
+    </div>`;
+  });
+
+  // Client Mix
+  html += `
+  <div class="tier-card" style="margin-bottom:32px">
+    <div class="section-label" style="margin-bottom:16px">Client Mix & Targets</div>
+    <div class="input-grid-6">
+      ${state.tiers.map((t,i) => inputField("T"+(i+1)+" Mix %", "clientMix."+i, state.clientMix[i], "", "%")).join("")}
+      ${inputField("Target MRR", "targetMRR", state.targetMRR, "$", "", 1, "accent")}
+      ${inputField("Fixed Costs/mo", "fixedCosts", state.fixedCosts, "$")}
+    </div>
+  </div>`;
+
+  // Blended economics
+  const totalMix = state.clientMix.reduce((a,b)=>a+b, 0);
+  const norm = state.clientMix.map(c => totalMix > 0 ? c/totalMix : 0.25);
+  const blMRR = state.tiers.reduce((s,t,i) => s + tierMRR(t)*norm[i], 0);
+  const blARR = blMRR * 12;
+  const blSetup = state.tiers.reduce((s,t,i) => s + t.setupFee*norm[i], 0);
+  const blSalesExp = state.tiers.reduce((s,t,i) => s + tierSalesExp(t)*norm[i], 0);
+  const blLTV = state.tiers.reduce((s,t,i) => s + tierLTV(t)*norm[i], 0);
+  const blCAC = state.tiers.reduce((s,t,i) => s + tierCAC(t)*norm[i], 0);
+  const blChurn = state.tiers.reduce((s,t,i) => s + t.churnPct*norm[i], 0);
+  const blLTVCAC = blLTV / (blCAC || 1);
+  const clientsForTarget = Math.ceil(state.targetMRR / (blMRR || 1));
+  const annualSalesAtTarget = clientsForTarget * blSalesExp;
+  const annualRevAtTarget = clientsForTarget * blARR;
+  const salesPctAtTarget = annualRevAtTarget > 0 ? (annualSalesAtTarget/annualRevAtTarget)*100 : 0;
+  const breakEvenClients = Math.ceil(state.fixedCosts / ((blMRR - blSalesExp/12) || 1));
+
+  html += `
+  <div style="margin-bottom:32px">
+    <div class="section-label">Blended Unit Economics (Weighted by Client Mix)</div>
+    <div class="metrics-grid-5">
+      ${metricBox("Blended MRR", fmt(blMRR), "per client", "")}
+      ${metricBox("Blended ARR", fmt(blARR), "per client", "")}
+      ${metricBox("Blended Sales Exp", fmt(blSalesExp), "per deal (annual)", "orange")}
+      ${metricBox("Blended LTV", fmt(blLTV), "at "+fmtPct(blChurn)+" monthly churn", "sky")}
+      ${metricBox("LTV:CAC", blLTVCAC.toFixed(1)+"x", "CAC: "+fmt(blCAC), colorLTVCAC(blLTVCAC))}
+    </div>
+    <div class="metrics-grid-3">
+      ${metricBox("Clients to Target MRR", clientsForTarget, fmt(state.targetMRR)+"/mo target", "sky")}
+      ${metricBox("Breakeven Clients", breakEvenClients, "covers "+fmt(state.fixedCosts)+"/mo fixed costs", "yellow")}
+      ${metricBox("Sales Exp % at Target", fmtPct(salesPctAtTarget), fmt(annualSalesAtTarget)+" annual sales cost", colorSalesPct(salesPctAtTarget))}
+    </div>
+  </div>`;
+
+  // Threshold table
+  const thresholds = [25000,50000,75000,100000,150000,250000,500000];
+  html += `
+  <div class="table-wrap">
+    <div class="section-label" style="margin-bottom:16px">MRR Threshold Analysis — Clients & Sales Expense by Target</div>
+    <table>
+      <thead><tr>
+        <th style="text-align:left">Target MRR</th><th>Total Clients</th>
+        ${state.tiers.map((_,i)=>`<th>T${i+1}</th>`).join("")}
+        <th>Annual Revenue</th><th>Setup Rev (Yr 1)</th><th>Sales Expense</th><th>Sales %</th><th>Gross Margin</th>
+      </tr></thead>
+      <tbody>`;
+
+  thresholds.forEach(target => {
+    const clients = Math.ceil(target / (blMRR || 1));
+    const annRev = clients * blARR;
+    const setupRev = clients * blSetup;
+    const salesExp = clients * blSalesExp;
+    const salesPct = annRev > 0 ? (salesExp/annRev)*100 : 0;
+    const grossMargin = annRev - salesExp - (state.fixedCosts * 12);
+    const perTier = state.tiers.map((_,i) => Math.round(clients * norm[i]));
+    const hl = target === state.targetMRR ? ' class="highlight"' : '';
+
+    html += `<tr${hl}>
+      <td style="text-align:left;font-family:'JetBrains Mono',monospace;font-weight:700;${target===state.targetMRR?'color:#38bdf8':''}">${fmt(target)}</td>
+      <td class="bold">${clients}</td>
+      ${perTier.map(c=>`<td class="muted" style="font-size:12px">${c}</td>`).join("")}
+      <td>${fmt(annRev)}</td>
+      <td class="muted">${fmt(setupRev)}</td>
+      <td class="orange">${fmt(salesExp)}</td>
+      <td class="bold ${colorSalesPct(salesPct)}">${fmtPct(salesPct)}</td>
+      <td class="bold ${colorMargin(grossMargin)}">${fmt(grossMargin)}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>
+    <div class="table-note">Gross Margin = Annual Revenue − Sales Expense − Fixed Costs (annualized). Setup revenue shown separately as one-time Yr 1 income. Green sales % = at or below 25% of ARR.</div>
+  </div>`;
+
+  // Per-tier standalone
+  html += `
+  <div class="table-wrap">
+    <div class="section-label" style="margin-bottom:16px">Per-Tier Standalone Economics</div>
+    <table>
+      <thead><tr>
+        <th style="text-align:left">Tier</th><th>MRR</th><th>ARR</th><th>Sales Exp</th><th>Setup</th><th>Net Yr 1</th><th>LTV</th><th>CAC</th><th>LTV:CAC</th><th>Payback</th>
+      </tr></thead>
+      <tbody>`;
+
+  state.tiers.forEach((t,i) => {
+    const mrr = tierMRR(t), arr = tierARR(t), sExp = tierSalesExp(t);
+    const netYr1 = arr + t.setupFee - sExp;
+    const ltv = tierLTV(t), cac = tierCAC(t);
+    const lc = ltv/(cac||1), pb = cac/(mrr||1);
+
+    html += `<tr>
+      <td>${t.name}</td>
+      <td class="sky bold">${fmt(mrr)}</td>
+      <td>${fmt(arr)}</td>
+      <td class="orange">${fmt(sExp)}</td>
+      <td class="muted">${fmt(t.setupFee)}</td>
+      <td class="bold ${colorMargin(netYr1)}">${fmt(netYr1)}</td>
+      <td class="sky">${fmt(ltv)}</td>
+      <td class="muted">${fmt(cac)}</td>
+      <td class="bold ${colorLTVCAC(lc)}">${lc.toFixed(1)}x</td>
+      <td class="${colorPayback(pb)}">${pb.toFixed(1)} mo</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>
+    <div class="table-note">CAC = Sales Expense + 30% of Setup Fee (onboarding cost allocation). LTV = (MRR × 12) / Monthly Churn %. Payback = months to recover CAC from MRR. Green = healthy (>3x LTV:CAC, <6mo payback).</div>
+  </div>`;
+
+  html += `<div class="footer">All fields editable — adjust pricing, mix, and targets to model scenarios</div>`;
+
+  app.innerHTML = html;
+
+  // Attach listeners
+  app.querySelectorAll("input[data-field]").forEach(el => {
+    el.addEventListener("input", function() {
+      const path = this.dataset.field.split(".");
+      let val = parseFloat(this.value) || 0;
+      if (path[0] === "tiers") {
+        state.tiers[parseInt(path[1])][path[2]] = val;
+      } else if (path[0] === "clientMix") {
+        state.clientMix[parseInt(path[1])] = val;
+      } else {
+        state[path[0]] = val;
+      }
+      render();
+      // Restore focus
+      const next = app.querySelector(`input[data-field="${this.dataset.field}"]`);
+      if (next) { next.focus(); next.selectionStart = next.selectionEnd = next.value.length; }
+    });
+  });
+}
+
+// ─── Helpers ───
+function inputField(label, field, value, prefix, suffix, step, cls) {
+  return `<div>
+    <div class="input-label">${label}</div>
+    <div class="input-wrap">
+      ${prefix ? `<span class="input-prefix">${prefix}</span>` : ""}
+      <input type="number" data-field="${field}" value="${value}" step="${step||1}" class="${cls||''}">
+      ${suffix ? `<span class="input-suffix">${suffix}</span>` : ""}
+    </div>
+  </div>`;
+}
+
+function tierMetric(label, value, color) {
+  return `<div class="tier-metric">
+    <div class="tier-metric-label">${label}</div>
+    <div class="tier-metric-value ${color}">${value}</div>
+  </div>`;
+}
+
+function metricBox(label, value, sub, color) {
+  return `<div class="metric-box">
+    <div class="metric-box-label">${label}</div>
+    <div class="metric-box-value ${color}">${value}</div>
+    ${sub ? `<div class="metric-box-sub">${sub}</div>` : ""}
+  </div>`;
+}
+
+// ─── Init ───
+render();
+</script>
+</body>
+</html>
