@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structurely — Complete P&L Model</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { min-height: 100vh; background: linear-gradient(135deg, #0c1220 0%, #0f172a 40%, #0e1525 100%); color: #e2e8f0; font-family: 'DM Sans', -apple-system, sans-serif; padding: 32px 24px; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 1300px; margin: 0 auto; }
+        .header { margin-bottom: 24px; }
+        .header-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .header-accent { width: 8px; height: 32px; background: linear-gradient(180deg, #8b5cf6, #7c3aed); border-radius: 4px; }
+        .header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+        .header p { color: #64748b; font-size: 14px; padding-left: 20px; }
+        .section-label { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; margin-top: 20px; }
+        .card { background: rgba(15,23,42,0.6); border: 1px solid rgba(100,140,180,0.2); border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; }
+        .card:hover { border-color: rgba(100,140,180,0.35); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+        .input-label { font-size: 9px; color: #94a3b8; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-wrap { display: flex; align-items: center; background: rgba(30,41,59,0.8); border-radius: 5px; border: 1px solid rgba(100,140,180,0.15); padding: 5px 8px; }
+        .input-wrap:focus-within { border-color: rgba(139,92,246,0.5); box-shadow: 0 0 0 2px rgba(139,92,246,0.1); }
+        .input-wrap input { background: transparent; border: none; color: #e2e8f0; font-size: 13px; font-weight: 600; width: 100%; outline: none; font-family: 'JetBrains Mono', monospace; }
+        .input-wrap input:focus { color: #fff; }
+        .input-wrap input:disabled { color: #64748b; }
+        .input-prefix { color: #64748b; font-size: 12px; margin-right: 2px; }
+        .input-suffix { color: #64748b; font-size: 11px; margin-left: 2px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; }
+        .summary-box { background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.3); border-radius: 8px; padding: 12px; text-align: center; }
+        .summary-box.green-box { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); }
+        .summary-box.red-box { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); }
+        .summary-box.yellow-box { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); }
+        .summary-box.blue-box { background: rgba(56,189,248,0.1); border-color: rgba(56,189,248,0.3); }
+        .summary-label { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .summary-value { font-size: 20px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+        .summary-sub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { padding: 8px 6px; text-align: right; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 9px; border-bottom: 2px solid rgba(100,140,180,0.2); }
+        th:first-child { text-align: left; }
+        td { padding: 10px 6px; text-align: right; font-family: 'JetBrains Mono', monospace; border-bottom: 1px solid rgba(100,140,180,0.1); }
+        td:first-child { text-align: left; font-family: 'DM Sans', sans-serif; font-weight: 600; }
+        td input { width: 70px; text-align: right; }
+        .channel-row { display: grid; grid-template-columns: 80px repeat(4, 1fr) 80px; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(100,140,180,0.1); align-items: center; }
+        .channel-row.header { font-size: 9px; color: #64748b; text-transform: uppercase; border-bottom: 2px solid rgba(100,140,180,0.2); }
+        .channel-row .ch-name { font-weight: 600; }
+        .channel-row .value { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+        .pnl-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(100,140,180,0.1); font-size: 13px; }
+        .pnl-row.total { border-top: 2px solid rgba(100,140,180,0.3); border-bottom: none; padding-top: 10px; margin-top: 4px; }
+        .pnl-row span:first-child { color: #94a3b8; }
+        .pnl-row span:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+        .funnel-visual { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+        .funnel-stage { text-align: center; flex: 1; }
+        .funnel-stage-label { font-size: 9px; color: #64748b; }
+        .funnel-stage-value { font-size: 14px; font-weight: 700; color: #8b5cf6; }
+        .funnel-arrow { color: #475569; font-size: 12px; }
+        .green { color: #10b981; }
+        .yellow { color: #f59e0b; }
+        .red { color: #ef4444; }
+        .purple { color: #8b5cf6; }
+        .sky { color: #38bdf8; }
+        .muted { color: #94a3b8; }
+        .logo-text { font-size: 11px; font-weight: 600; color: #64748b; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+        .footer { text-align: center; margin-top: 24px; font-size: 10px; color: #334155; }
+        .formula-box { background: rgba(30,41,59,0.5); border-radius: 6px; padding: 10px 12px; margin-top: 10px; font-size: 11px; color: #94a3b8; }
+        .formula-box code { color: #8b5cf6; font-family: 'JetBrains Mono', monospace; }
+        .inline-input { display: inline-flex; align-items: center; background: rgba(30,41,59,0.8); border-radius: 4px; border: 1px solid rgba(100,140,180,0.15); padding: 3px 6px; }
+        .inline-input input { background: transparent; border: none; color: #e2e8f0; font-size: 12px; font-weight: 600; width: 50px; outline: none; font-family: 'JetBrains Mono', monospace; text-align: right; }
+        @media (max-width: 1000px) { .summary-grid { grid-template-columns: repeat(3, 1fr); } }
+    </style>
+</head>
+<body>
+<div class="container" id="app"></div>
+<script>
+const state = {
+    // Channel Economics (Cost & Retail Price per token)
+    channels: {
+        voice: { name: "Voice", costPerToken: 0.0333, retailPerToken: 0.06, tokensPerUnit: 6, unitLabel: "min" },
+        sms: { name: "SMS", costPerToken: 0.025, retailPerToken: 0.05, tokensPerUnit: 1, unitLabel: "msg" },
+        email: { name: "Email", costPerToken: 0.021, retailPerToken: 0.10, tokensPerUnit: 1, unitLabel: "msg" }
+    },
+    // Channel Mix (how tokens are distributed across channels)
+    channelMix: { voicePct: 25, smsPct: 75, emailPct: 0 },
+    // CS Cost
+    csPerHour: 110,
+    // Tier Economics (tokenUsage defaults to includedTokens)
+    tiers: [
+        { name: "Individual", platformFee: 99, setupFee: 1500, includedTokens: 1000, tokenUsage: 1000, usageStep: 100, csHours: 0, clientMixPct: 60, churnPct: 5, addonPrice: 0, addonAdoptPct: 0 },
+        { name: "Small Team", platformFee: 499, setupFee: 2000, includedTokens: 5000, tokenUsage: 5000, usageStep: 500, csHours: 1, clientMixPct: 30, churnPct: 3, addonPrice: 0, addonAdoptPct: 0 },
+        { name: "Large Team", platformFee: 999, setupFee: 2500, includedTokens: 10000, tokenUsage: 10000, usageStep: 1000, csHours: 2, clientMixPct: 10, churnPct: 3, addonPrice: 0, addonAdoptPct: 0 }
+    ],
+    // Sales
+    sales: {
+        numAEs: 2,
+        aeBaseSalary: 70000,
+        aeCommissionOffset: 500,
+        croBaseSalary: 60000,
+        croArrPct: 5,
+        croArrThreshold: 2000000
+    },
+    funnel: {
+        discoveryCalls: 65,
+        discoveryToDemo: 50,
+        demoToContract: 25
+    }
+};
+
+function fmt(n) { return "$" + n.toFixed(2); }
+function fmt4(n) { return "$" + n.toFixed(4); }
+function fmtK(n) { return n >= 1000000 ? "$" + (n/1000000).toFixed(2) + "M" : n >= 1000 ? "$" + (n/1000).toFixed(0) + "K" : "$" + Math.round(n); }
+function fmtPct(n) { return n.toFixed(1) + "%"; }
+
+// Blended cost per token based on channel mix
+function getBlendedCostPerToken() {
+    const { voicePct, smsPct, emailPct } = state.channelMix;
+    const total = voicePct + smsPct + emailPct;
+    if (total === 0) return 0;
+    const { voice, sms, email } = state.channels;
+    return (voice.costPerToken * voicePct + sms.costPerToken * smsPct + email.costPerToken * emailPct) / total;
+}
+
+// Blended retail per token
+function getBlendedRetailPerToken() {
+    const { voicePct, smsPct, emailPct } = state.channelMix;
+    const total = voicePct + smsPct + emailPct;
+    if (total === 0) return 0;
+    const { voice, sms, email } = state.channels;
+    return (voice.retailPerToken * voicePct + sms.retailPerToken * smsPct + email.retailPerToken * emailPct) / total;
+}
+
+function calcTierEconomics(tier) {
+    const blendedCost = getBlendedCostPerToken();
+    const blendedRetail = getBlendedRetailPerToken();
+    
+    // COGS based on actual usage
+    const tokenCost = tier.tokenUsage * blendedCost;
+    const csCost = tier.csHours * state.csPerHour;
+    const totalCOGS = tokenCost + csCost;
+    
+    // Overage revenue (usage beyond included tokens)
+    const overageTokens = Math.max(0, tier.tokenUsage - tier.includedTokens);
+    const overageRevenue = overageTokens * blendedRetail;
+    
+    // Add-on revenue (price × adoption %)
+    const addonRevenue = tier.addonPrice * (tier.addonAdoptPct / 100);
+    
+    // Total revenue = Platform Fee + Overage + Add-ons
+    const totalRevenue = tier.platformFee + overageRevenue + addonRevenue;
+    
+    // Gross Profit & Margin
+    const grossProfit = totalRevenue - totalCOGS;
+    const grossMargin = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
+    
+    return { tokenCost, csCost, totalCOGS, overageTokens, overageRevenue, addonRevenue, totalRevenue, grossProfit, grossMargin };
+}
+
+function calcBlendedTier() {
+    let revenue = 0, cogs = 0, setupFee = 0, overageRev = 0, addonRev = 0, churn = 0;
+    state.tiers.forEach(t => {
+        const e = calcTierEconomics(t);
+        const mix = t.clientMixPct / 100;
+        revenue += e.totalRevenue * mix;
+        cogs += e.totalCOGS * mix;
+        setupFee += t.setupFee * mix;
+        overageRev += e.overageRevenue * mix;
+        addonRev += e.addonRevenue * mix;
+        churn += t.churnPct * mix;
+    });
+    const profit = revenue - cogs;
+    const margin = revenue > 0 ? (profit / revenue) * 100 : 0;
+    return { revenue, cogs, profit, margin, setupFee, overageRev, addonRev, churn };
+}
+
+function calcSalesFunnel() {
+    const { numAEs } = state.sales;
+    const { discoveryCalls, discoveryToDemo, demoToContract } = state.funnel;
+    const calls = discoveryCalls * numAEs;
+    const demos = calls * (discoveryToDemo / 100);
+    const contracts = demos * (demoToContract / 100);
+    return { calls, demos, contracts, annual: contracts * 12 };
+}
+
+function calcBlendedCommission() {
+    let blended = 0;
+    state.tiers.forEach(t => {
+        blended += (t.setupFee - state.sales.aeCommissionOffset) * (t.clientMixPct / 100);
+    });
+    return blended;
+}
+
+function calcMetricsForContracts(monthlyContracts) {
+    const blended = calcBlendedTier();
+    const commission = calcBlendedCommission();
+    const { numAEs, aeBaseSalary, croBaseSalary, croArrPct, croArrThreshold } = state.sales;
+    const monthlyChurn = blended.churn / 100;
+    
+    // Active clients after 12 months with blended churn
+    let activeClients = 0;
+    for (let m = 1; m <= 12; m++) {
+        activeClients += monthlyContracts * Math.pow(1 - monthlyChurn, 13 - m);
+    }
+    
+    // Revenue
+    const annualARR = activeClients * blended.revenue * 12;
+    const setupRevenue = (monthlyContracts * 12) * blended.setupFee;
+    const totalRevenue = annualARR + setupRevenue;
+    
+    // COGS
+    const annualCOGS = activeClients * blended.cogs * 12;
+    
+    // Gross Profit
+    const grossProfit = totalRevenue - annualCOGS;
+    const grossMargin = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
+    
+    // Sales Expense
+    const aeBase = numAEs * aeBaseSalary;
+    const aeComm = (monthlyContracts * 12) * commission;
+    const aeTotal = aeBase + aeComm;
+    const croComm = Math.max(0, annualARR - croArrThreshold) * (croArrPct / 100);
+    const croTotal = croBaseSalary + croComm;
+    const salesExpense = aeTotal + croTotal;
+    const salesRatio = totalRevenue > 0 ? (salesExpense / totalRevenue) * 100 : 0;
+    
+    // Net Operating
+    const netProfit = grossProfit - salesExpense;
+    const netMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+    
+    return { activeClients: Math.round(activeClients), annualARR, setupRevenue, totalRevenue, annualCOGS, grossProfit, grossMargin, aeBase, aeComm, aeTotal, croTotal, salesExpense, salesRatio, netProfit, netMargin };
+}
+
+function calcAnnualMetrics() {
+    const funnel = calcSalesFunnel();
+    const blended = calcBlendedTier();
+    const commission = calcBlendedCommission();
+    const { numAEs, aeBaseSalary, croBaseSalary, croArrPct, croArrThreshold } = state.sales;
+    const monthlyChurn = blended.churn / 100;
+    
+    // Active clients after 12 months with blended churn
+    let activeClients = 0;
+    for (let m = 1; m <= 12; m++) {
+        activeClients += funnel.contracts * Math.pow(1 - monthlyChurn, 13 - m);
+    }
+    
+    // Revenue
+    const annualARR = activeClients * blended.revenue * 12;
+    const setupRevenue = funnel.annual * blended.setupFee;
+    const totalRevenue = annualARR + setupRevenue;
+    
+    // COGS
+    const annualCOGS = activeClients * blended.cogs * 12;
+    
+    // Gross Profit
+    const grossProfit = totalRevenue - annualCOGS;
+    const grossMargin = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
+    
+    // Sales Expense
+    const aeBase = numAEs * aeBaseSalary;
+    const aeComm = funnel.annual * commission;
+    const aeTotal = aeBase + aeComm;
+    const croComm = Math.max(0, annualARR - croArrThreshold) * (croArrPct / 100);
+    const croTotal = croBaseSalary + croComm;
+    const salesExpense = aeTotal + croTotal;
+    const salesRatio = totalRevenue > 0 ? (salesExpense / totalRevenue) * 100 : 0;
+    
+    // Net Operating
+    const netProfit = grossProfit - salesExpense;
+    const netMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+    
+    return { funnel, blendedChurn: blended.churn, activeClients: Math.round(activeClients), annualARR, setupRevenue, totalRevenue, annualCOGS, grossProfit, grossMargin, aeBase, aeComm, aeTotal, croTotal, salesExpense, salesRatio, netProfit, netMargin, commission };
+}
+
+function render() {
+    const app = document.getElementById("app");
+    const blendedCost = getBlendedCostPerToken();
+    const blendedRetail = getBlendedRetailPerToken();
+    const blended = calcBlendedTier();
+    const m = calcAnnualMetrics();
+    const { voice, sms, email } = state.channels;
+    const { voicePct, smsPct, emailPct } = state.channelMix;
+    
+    let html = `
+    <div class="header">
+        <div class="logo-text">Structurely</div>
+        <div class="header-bar"><div class="header-accent"></div><h1>Complete P&L Model</h1></div>
+        <p>Token Economics + COGS + Sales Expense = Net Operating Margin</p>
+    </div>
+    
+    <div class="summary-grid">
+        <div class="summary-box blue-box"><div class="summary-label">Total Revenue</div><div class="summary-value sky">${fmtK(m.totalRevenue)}</div><div class="summary-sub">ARR + Setup</div></div>
+        <div class="summary-box red-box"><div class="summary-label">COGS</div><div class="summary-value red">${fmtK(m.annualCOGS)}</div><div class="summary-sub">Tokens + CS</div></div>
+        <div class="summary-box green-box"><div class="summary-label">Gross Profit</div><div class="summary-value green">${fmtK(m.grossProfit)}</div><div class="summary-sub">${fmtPct(m.grossMargin)}</div></div>
+        <div class="summary-box yellow-box"><div class="summary-label">Sales Expense</div><div class="summary-value yellow">${fmtK(m.salesExpense)}</div><div class="summary-sub">${fmtPct(m.salesRatio)}</div></div>
+        <div class="summary-box ${m.netMargin >= 15 ? 'green-box' : m.netMargin >= 0 ? 'yellow-box' : 'red-box'}"><div class="summary-label">Net Operating</div><div class="summary-value ${m.netMargin >= 15 ? 'green' : m.netMargin >= 0 ? 'yellow' : 'red'}">${fmtK(m.netProfit)}</div><div class="summary-sub">${fmtPct(m.netMargin)}</div></div>
+        <div class="summary-box"><div class="summary-label">Active Clients</div><div class="summary-value purple">${m.activeClients}</div><div class="summary-sub">after 12mo</div></div>
+    </div>`;
+    
+    // Token Economics by Channel
+    html += `<div class="section-label">Token Economics by Channel</div><div class="card">
+        <div class="channel-row header"><div>Channel</div><div class="value">Cost/Token</div><div class="value">Retail/Token</div><div class="value">Margin</div><div class="value">Channel Mix</div><div></div></div>`;
+    
+    const mixTotal = voicePct + smsPct + emailPct;
+    const mixValid = mixTotal === 100;
+    
+    [['voice', voice, voicePct], ['sms', sms, smsPct], ['email', email, emailPct]].forEach(([key, ch, pct]) => {
+        const margin = ch.retailPerToken > 0 ? ((ch.retailPerToken - ch.costPerToken) / ch.retailPerToken * 100) : 0;
+        const mClass = margin >= 50 ? 'green' : margin >= 30 ? 'yellow' : 'red';
+        html += `<div class="channel-row">
+            <div class="ch-name">${ch.name}</div>
+            <div class="value"><span class="inline-input"><span class="input-prefix">$</span><input type="number" data-field="channels.${key}.costPerToken" value="${ch.costPerToken}" step="0.001"></span></div>
+            <div class="value"><span class="inline-input"><span class="input-prefix">$</span><input type="number" data-field="channels.${key}.retailPerToken" value="${ch.retailPerToken}" step="0.01"></span></div>
+            <div class="value ${mClass}">${fmtPct(margin)}</div>
+            <div class="value"><span class="inline-input"><input type="number" data-field="channelMix.${key}Pct" value="${pct}" step="5" style="width:40px"><span class="input-suffix">%</span></span></div>
+            <div></div>
+        </div>`;
+    });
+    
+    html += `<div class="channel-row" style="border-bottom:none;padding-top:4px;">
+        <div></div><div></div><div></div><div></div>
+        <div class="value ${mixValid ? 'green' : 'red'}" style="font-weight:700">${mixTotal}%</div>
+        <div class="${mixValid ? 'green' : 'red'}" style="font-size:10px">${mixValid ? '✓' : 'Must = 100%'}</div>
+    </div>`;
+    
+    html += `<div class="formula-box">
+        <strong>Blended Cost/Token:</strong> <code>${fmt4(blendedCost)}</code> &nbsp;|&nbsp; 
+        <strong>Blended Retail/Token:</strong> <code>${fmt4(blendedRetail)}</code> &nbsp;|&nbsp;
+        <strong>CS Cost/Hour:</strong> <span class="inline-input"><span class="input-prefix">$</span><input type="number" data-field="csPerHour" value="${state.csPerHour}" step="5" style="width:50px"></span>
+    </div></div>`;
+    
+    // Tier Economics
+    html += `<div class="section-label">Tier Economics (Per Client / Month)</div><div class="card"><table style="font-size:11px">
+        <thead><tr><th>Tier</th><th>Platform</th><th>Setup</th><th>Tokens Incl</th><th>Usage</th><th>Overage $</th><th>Add-on $</th><th>Add-on %</th><th>Total Rev</th><th>COGS</th><th>Profit</th><th>GM%</th><th>Churn</th><th>CS</th><th>Mix</th></tr></thead><tbody>`;
+    
+    state.tiers.forEach((t, i) => {
+        const e = calcTierEconomics(t);
+        const gmClass = e.grossMargin >= 60 ? 'green' : e.grossMargin >= 40 ? 'yellow' : 'red';
+        html += `<tr>
+            <td>${t.name}</td>
+            <td><span class="inline-input"><span class="input-prefix">$</span><input type="number" data-field="tiers.${i}.platformFee" value="${t.platformFee}" style="width:45px"></span></td>
+            <td><span class="inline-input"><span class="input-prefix">$</span><input type="number" data-field="tiers.${i}.setupFee" value="${t.setupFee}" style="width:50px"></span></td>
+            <td><span class="inline-input"><input type="number" data-field="tiers.${i}.includedTokens" value="${t.includedTokens}" style="width:50px"></span></td>
+            <td><span class="inline-input"><input type="number" data-field="tiers.${i}.tokenUsage" value="${t.tokenUsage}" step="${t.usageStep}" style="width:50px"></span></td>
+            <td class="${e.overageRevenue > 0 ? 'green' : 'muted'}">${fmt(e.overageRevenue)}</td>
+            <td><span class="inline-input"><span class="input-prefix">$</span><input type="number" data-field="tiers.${i}.addonPrice" value="${t.addonPrice}" style="width:45px"></span></td>
+            <td><span class="inline-input"><input type="number" data-field="tiers.${i}.addonAdoptPct" value="${t.addonAdoptPct}" step="5" style="width:35px"><span class="input-suffix">%</span></span></td>
+            <td class="sky">${fmt(e.totalRevenue)}</td>
+            <td class="red">${fmt(e.totalCOGS)}</td>
+            <td class="${gmClass}">${fmt(e.grossProfit)}</td>
+            <td class="${gmClass}">${fmtPct(e.grossMargin)}</td>
+            <td><span class="inline-input"><input type="number" data-field="tiers.${i}.churnPct" value="${t.churnPct}" step="0.5" style="width:30px"><span class="input-suffix">%</span></span></td>
+            <td><span class="inline-input"><input type="number" data-field="tiers.${i}.csHours" value="${t.csHours}" step="0.5" style="width:30px"></span></td>
+            <td><span class="inline-input"><input type="number" data-field="tiers.${i}.clientMixPct" value="${t.clientMixPct}" step="5" style="width:30px"><span class="input-suffix">%</span></span></td>
+        </tr>`;
+    });
+    html += `</tbody></table>
+        <div class="formula-box"><strong>Blended (per client):</strong> Revenue <code>${fmt(blended.revenue)}</code> (Add-ons: ${fmt(blended.addonRev)}) | COGS <code>${fmt(blended.cogs)}</code> | Profit <code>${fmt(blended.profit)}</code> | GM <code>${fmtPct(blended.margin)}</code> | Churn <code>${fmtPct(blended.churn)}</code></div>
+    </div>`;
+    
+    // Sales Funnel
+    html += `<div class="section-label">Sales Funnel & Compensation</div><div class="card"><div class="grid-6">
+        ${inputField("# AEs", "sales.numAEs", state.sales.numAEs)}
+        ${inputField("Calls/AE/Mo", "funnel.discoveryCalls", state.funnel.discoveryCalls)}
+        ${inputField("Call→Demo", "funnel.discoveryToDemo", state.funnel.discoveryToDemo, "", "%", 5)}
+        ${inputField("Demo→Contract", "funnel.demoToContract", state.funnel.demoToContract, "", "%", 5)}
+        ${inputField("AE Base", "sales.aeBaseSalary", state.sales.aeBaseSalary, "$")}
+        ${inputField("Comm Offset", "sales.aeCommissionOffset", state.sales.aeCommissionOffset, "$")}
+    </div>
+    <div class="funnel-visual">
+        <div class="funnel-stage"><div class="funnel-stage-label">Calls/Mo</div><div class="funnel-stage-value">${Math.round(m.funnel.calls)}</div></div>
+        <div class="funnel-arrow">→</div>
+        <div class="funnel-stage"><div class="funnel-stage-label">Demos</div><div class="funnel-stage-value">${Math.round(m.funnel.demos)}</div></div>
+        <div class="funnel-arrow">→</div>
+        <div class="funnel-stage"><div class="funnel-stage-label">Contracts/Mo</div><div class="funnel-stage-value purple">${Math.round(m.funnel.contracts)}</div></div>
+        <div class="funnel-arrow">→</div>
+        <div class="funnel-stage"><div class="funnel-stage-label">Annual</div><div class="funnel-stage-value green">${Math.round(m.funnel.annual)}</div></div>
+    </div>
+    <div class="formula-box" style="margin-top:12px">
+        <strong>AE Comp:</strong> ${fmtK(m.aeBase)} base + ${fmtK(m.aeComm)} commission = <code>${fmtK(m.aeTotal)}</code> &nbsp;|&nbsp;
+        <strong>CRO:</strong> <span class="inline-input"><span class="input-prefix">$</span><input type="number" data-field="sales.croBaseSalary" value="${state.sales.croBaseSalary}" style="width:60px"></span> + 
+        <span class="inline-input"><input type="number" data-field="sales.croArrPct" value="${state.sales.croArrPct}" style="width:30px"><span class="input-suffix">%</span></span> above 
+        <span class="inline-input"><span class="input-prefix">$</span><input type="number" data-field="sales.croArrThreshold" value="${state.sales.croArrThreshold}" style="width:80px"></span> = <code>${fmtK(m.croTotal)}</code>
+    </div></div>`;
+    
+    // P&L Summary
+    html += `<div class="section-label">Annual P&L Summary</div><div class="card"><div class="grid-2">
+        <div>
+            <div class="pnl-row"><span>Recurring Revenue (ARR)</span><span class="sky">${fmtK(m.annualARR)}</span></div>
+            <div class="pnl-row"><span>Setup Fee Revenue</span><span class="sky">${fmtK(m.setupRevenue)}</span></div>
+            <div class="pnl-row total"><span><strong>Total Revenue</strong></span><span class="sky"><strong>${fmtK(m.totalRevenue)}</strong></span></div>
+            <div class="pnl-row"><span>COGS (Tokens + CS)</span><span class="red">-${fmtK(m.annualCOGS)}</span></div>
+            <div class="pnl-row total"><span><strong>Gross Profit</strong></span><span class="green"><strong>${fmtK(m.grossProfit)}</strong></span></div>
+            <div class="pnl-row"><span>Gross Margin</span><span class="green">${fmtPct(m.grossMargin)}</span></div>
+        </div>
+        <div>
+            <div class="pnl-row"><span>AE Total Comp</span><span class="yellow">-${fmtK(m.aeTotal)}</span></div>
+            <div class="pnl-row"><span>CRO Total Comp</span><span class="yellow">-${fmtK(m.croTotal)}</span></div>
+            <div class="pnl-row total"><span><strong>Total Sales Expense</strong></span><span class="yellow"><strong>-${fmtK(m.salesExpense)}</strong></span></div>
+            <div class="pnl-row"><span>Sales Expense Ratio</span><span class="yellow">${fmtPct(m.salesRatio)}</span></div>
+            <div class="pnl-row total"><span><strong>Net Operating Profit</strong></span><span class="${m.netProfit >= 0 ? 'green' : 'red'}"><strong>${fmtK(m.netProfit)}</strong></span></div>
+            <div class="pnl-row"><span>Net Operating Margin</span><span class="${m.netMargin >= 15 ? 'green' : m.netMargin >= 0 ? 'yellow' : 'red'}">${fmtPct(m.netMargin)}</span></div>
+        </div>
+    </div></div>`;
+    
+    // Monthly Contract Threshold Analysis
+    const thresholds = [4, 6, 8, 10, 12, 16, 20, 24];
+    const currentContracts = Math.round(m.funnel.contracts);
+    
+    html += `<div class="section-label">Monthly Contract Threshold Analysis</div><div class="card"><table>
+        <thead><tr><th>Contracts/Mo</th><th>Annual</th><th>Active Clients</th><th>Total Revenue</th><th>COGS</th><th>Gross Profit</th><th>GM%</th><th>Sales Exp</th><th>Net Profit</th><th>Net Margin</th></tr></thead><tbody>`;
+    
+    thresholds.forEach(contracts => {
+        const tm = calcMetricsForContracts(contracts);
+        const isCurrent = contracts === currentContracts;
+        const netClass = tm.netMargin >= 15 ? 'green' : tm.netMargin >= 0 ? 'yellow' : 'red';
+        html += `<tr style="${isCurrent ? 'background:rgba(139,92,246,0.15)' : ''}">
+            <td style="${isCurrent ? 'color:#8b5cf6;font-weight:700' : ''}">${contracts}</td>
+            <td>${contracts * 12}</td>
+            <td>${tm.activeClients}</td>
+            <td class="sky">${fmtK(tm.totalRevenue)}</td>
+            <td class="red">${fmtK(tm.annualCOGS)}</td>
+            <td class="green">${fmtK(tm.grossProfit)}</td>
+            <td class="green">${fmtPct(tm.grossMargin)}</td>
+            <td class="yellow">${fmtK(tm.salesExpense)}</td>
+            <td class="${netClass}">${fmtK(tm.netProfit)}</td>
+            <td class="${netClass}">${fmtPct(tm.netMargin)}</td>
+        </tr>`;
+    });
+    
+    html += `</tbody></table>
+        <div class="formula-box">Current funnel produces <code>${currentContracts}</code> contracts/month (highlighted). Blended churn: <code>${fmtPct(m.blendedChurn)}</code>/month</div>
+    </div>`;
+    
+    html += `<div class="footer">Structurely Confidential — Q2 2026</div>`;
+    app.innerHTML = html;
+    attachListeners();
+}
+
+function inputField(label, field, value, prefix, suffix, step) {
+    return `<div><div class="input-label">${label}</div><div class="input-wrap">${prefix ? '<span class="input-prefix">'+prefix+'</span>' : ''}<input type="number" data-field="${field}" value="${value}" step="${step||1}">${suffix ? '<span class="input-suffix">'+suffix+'</span>' : ''}</div></div>`;
+}
+
+let pendingRender = false, lastField = null;
+
+function updateState(field, value) {
+    const p = field.split(".");
+    let val = parseFloat(value); if (isNaN(val)) val = 0;
+    if (p.length === 2) state[p[0]][p[1]] = val;
+    else if (p.length === 3) {
+        // Handle both tiers[0].field and channels.voice.field
+        if (!isNaN(parseInt(p[1]))) {
+            state[p[0]][parseInt(p[1])][p[2]] = val;
+        } else {
+            state[p[0]][p[1]][p[2]] = val;
+        }
+    }
+    // Normalize channel mix to 100%
+    if (field.startsWith("channelMix.")) {
+        const { voicePct, smsPct, emailPct } = state.channelMix;
+        const total = voicePct + smsPct + emailPct;
+        if (total !== 100 && total > 0) {
+            const scale = 100 / total;
+            state.channelMix.voicePct = Math.round(state.channelMix.voicePct * scale);
+            state.channelMix.smsPct = Math.round(state.channelMix.smsPct * scale);
+            state.channelMix.emailPct = 100 - state.channelMix.voicePct - state.channelMix.smsPct;
+        }
+    }
+    pendingRender = true;
+}
+
+function attachListeners() {
+    document.querySelectorAll("input[data-field]").forEach(el => {
+        el.addEventListener("focus", function() {
+            const f = this.dataset.field;
+            if (lastField && lastField !== f && pendingRender) { pendingRender = false; render(); setTimeout(() => { const n = document.querySelector('input[data-field="'+f+'"]'); if(n){n.focus();n.select();} }, 10); }
+            else this.select();
+            lastField = f;
+        });
+        el.addEventListener("input", function() { updateState(this.dataset.field, this.value); });
+        el.addEventListener("blur", function() { setTimeout(() => { if (!(document.activeElement?.dataset?.field) && pendingRender) { pendingRender = false; lastField = null; render(); } }, 50); });
+        el.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); updateState(this.dataset.field, this.value); pendingRender = false; render(); } });
+    });
+}
+
+render();
+</script>
+</body>
+</html>
