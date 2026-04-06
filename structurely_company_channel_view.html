@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Structurely — Company Account: West Capital Mortgage</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --navy:#1E2538;--navy-80:#2d3450;--blue:#3B6CB5;--blue-light:#e8eef8;--blue-mid:#c4d4ee;
+  --accent:#4B7BFF;--accent-10:#eef1ff;--purple:#7C5CFC;--purple-10:#f1eeff;
+  --teal:#0ea5e9;--teal-10:#e0f4ff;--success:#1a9e5c;--success-bg:#e6f7ee;
+  --warn:#d97706;--warn-bg:#fef3cd;--danger:#d94040;--danger-bg:#fce8e8;
+  --email:#10b981;--bg:#f0f2f6;--surface:#fff;--surface-2:#f6f7fb;
+  --border:#dde2ef;--text-1:#1E2538;--text-2:#4a5270;--text-3:#8691b0;
+  --zillow:#006aff;--zillow-bg:#e6eeff;
+  --past:#1a9e5c;--past-bg:#e6f7ee;
+  --data:#d97706;--data-bg:#fef3cd;
+  --radius:8px;--radius-lg:12px;
+  --shadow:0 1px 4px rgba(30,37,56,.10),0 0 0 1px rgba(30,37,56,.06);
+  --shadow-md:0 4px 16px rgba(30,37,56,.12),0 0 0 1px rgba(30,37,56,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);font-size:13px;min-height:100vh}
+
+/* NAV */
+.top-nav{background:var(--navy);height:52px;display:flex;align-items:center;padding:0 24px;gap:14px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(30,37,56,.4)}
+.brand-mark{display:flex;flex-direction:column;gap:3px}
+.brand-pill{height:7px;border-radius:3.5px}
+.pill-top{width:18px;margin-left:9px;background:var(--accent)}
+.pill-mid{width:21px;margin-left:3px;background:#3B6CB5}
+.pill-bot{width:18px;background:#7C5CFC}
+.brand-name{font-weight:700;font-size:16px;color:#fff;letter-spacing:-.8px}
+.nav-div{width:1px;height:22px;background:rgba(255,255,255,.18)}
+.nav-ctx{color:rgba(255,255,255,.5);font-size:12px;font-weight:500}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nbadge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px}
+.nb-cert{background:rgba(75,123,255,.18);color:var(--accent);border:1px solid rgba(75,123,255,.3)}
+.live-badge{background:var(--success);color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;display:flex;align-items:center;gap:4px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.8);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.2)}
+
+/* BREADCRUMB */
+.breadcrumb{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-3);position:sticky;top:52px;z-index:90}
+.bc-link{color:var(--blue);cursor:pointer;font-weight:500}
+.bc-link:hover{text-decoration:underline}
+.bc-sep{color:var(--border-2);font-size:14px}
+.bc-current{font-weight:700;color:var(--navy)}
+
+/* FILTER BAR */
+.filter-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:9px 24px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:sticky;top:90px;z-index:80}
+.fl{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em}
+.fsep{width:1px;height:18px;background:var(--border)}
+.fsel{font-size:12px;font-weight:600;color:var(--text-1);border:1.5px solid var(--border);border-radius:var(--radius);padding:5px 26px 5px 9px;background:var(--surface-2) url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%238691b0%22/></svg>') no-repeat right 7px center;-webkit-appearance:none;cursor:pointer;font-family:inherit}
+.date-range{display:flex;align-items:center;background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius)}
+.dw{display:flex;align-items:center;gap:5px;padding:5px 10px;cursor:pointer}
+.dw:first-child{border-right:1px solid var(--border)}
+.dd{font-size:12px;font-weight:600;color:var(--text-1);font-family:'DM Mono',monospace}
+.darrow{color:var(--text-3);font-size:11px;padding:0 6px}
+.toggle-wrap{display:flex;align-items:center;gap:6px}
+.toggle{width:34px;height:18px;border-radius:9px;background:var(--border);position:relative;cursor:pointer;transition:background .2s}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{transform:translateX(16px)}
+.tgl{font-size:12px;font-weight:500;color:var(--text-2)}
+.refresh-info{margin-left:auto;font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:4px}
+.rdot{width:5px;height:5px;border-radius:50%;background:var(--success);animation:pulse 2s infinite}
+
+/* MAIN */
+.main{padding:20px 24px}
+
+/* COMPANY HEADER CARD */
+.company-header{background:var(--navy);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:18px;display:flex;align-items:center;gap:20px;box-shadow:var(--shadow-md)}
+.co-logo{width:48px;height:48px;border-radius:12px;background:rgba(75,123,255,.25);border:2px solid rgba(75,123,255,.4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.co-info{flex:1}
+.co-name{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.5px;margin-bottom:4px}
+.co-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.co-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px}
+.cb-ent{background:rgba(75,123,255,.25);color:var(--accent);border:1px solid rgba(75,123,255,.4)}
+.cb-co{background:rgba(26,158,92,.25);color:#5dda9e;border:1px solid rgba(26,158,92,.4)}
+.cb-hub{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.2)}
+.co-meta-text{font-size:11px;color:rgba(255,255,255,.55)}
+.co-stats{display:flex;gap:24px;flex-shrink:0}
+.co-stat{text-align:right}
+.co-stat-val{font-size:22px;font-weight:700;color:#fff;font-family:'DM Mono',monospace;letter-spacing:-.5px;line-height:1}
+.co-stat-lbl{font-size:10px;color:rgba(255,255,255,.5);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.co-stat-div{width:1px;background:rgba(255,255,255,.15)}
+
+/* ROLLUP KPI ROW */
+.rollup-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}
+.rk{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:12px 14px;position:relative;overflow:hidden}
+.rk::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+.rk-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:5px}
+.rk-val{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.6px;font-family:'DM Mono',monospace;line-height:1;margin-bottom:4px}
+.rk-sub{font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:5px}
+.tr{font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px}
+.t-up{background:var(--success-bg);color:var(--success)}
+.t-dn{background:var(--danger-bg);color:var(--danger)}
+.t-flat{background:var(--bg);color:var(--text-3)}
+.t-warn{background:var(--warn-bg);color:var(--warn)}
+
+/* CHANNEL COLUMNS HEADER */
+.channels-label{font-size:14px;font-weight:700;color:var(--navy);letter-spacing:-.3px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.channels-label span{font-size:12px;font-weight:500;color:var(--text-3)}
+
+/* THREE CHANNEL COLUMNS */
+.channels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+
+.channel-card{border-radius:var(--radius-lg);border:2px solid var(--border);background:var(--surface);overflow:hidden;transition:box-shadow .15s}
+.channel-card:hover{box-shadow:var(--shadow-md)}
+
+.ch-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.ch-header.zillow{background:linear-gradient(135deg,#e6f0ff,#cce0ff);border-bottom:2px solid #006aff40}
+.ch-header.past{background:linear-gradient(135deg,#e6f7ee,#c3ecd5);border-bottom:2px solid #1a9e5c40}
+.ch-header.data{background:linear-gradient(135deg,#fef3cd,#fde9a0);border-bottom:2px solid #d9770640}
+.ch-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ch-icon.zillow{background:#006aff22;border:1px solid #006aff33}
+.ch-icon.past{background:#1a9e5c22;border:1px solid #1a9e5c33}
+.ch-icon.data{background:#d9770622;border:1px solid #d9770633}
+.ch-name{font-size:15px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
+.ch-sub{font-size:11px;color:var(--text-3);margin-top:1px}
+.ch-count{font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px}
+.cc-zillow{background:#006aff15;color:#006aff;border:1px solid #006aff30}
+.cc-past{background:var(--success-bg);color:var(--success);border:1px solid rgba(26,158,92,.3)}
+.cc-data{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(217,119,6,.3)}
+
+.ch-body{padding:16px}
+
+/* MINI FUNNEL IN CARD */
+.mini-funnel{display:flex;flex-direction:column;gap:3px;margin-bottom:14px}
+.mf-row{display:flex;align-items:center;gap:8px}
+.mf-label{width:110px;font-size:11px;font-weight:500;color:var(--text-2);text-align:right;flex-shrink:0}
+.mf-bar-wrap{flex:1;background:var(--bg);border-radius:3px;height:22px;overflow:hidden}
+.mf-bar{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:#fff;min-width:28px}
+.mf-val{width:46px;font-size:11px;font-weight:700;color:var(--navy);font-family:'DM Mono',monospace;text-align:right;flex-shrink:0}
+.mf-pct{width:38px;font-size:10px;font-weight:700;text-align:right;flex-shrink:0}
+.mf-drop{display:flex;justify-content:flex-end;padding:1px 84px 1px 118px}
+.mf-drop-txt{font-size:9px;color:var(--text-3)}
+
+/* KPI CHIPS IN CARD */
+.ch-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.kpi-chip{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 11px}
+.kc-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:3px}
+.kc-val{font-size:16px;font-weight:700;color:var(--navy);font-family:'DM Mono',monospace;letter-spacing:-.3px;line-height:1}
+.kc-sub{font-size:10px;color:var(--text-3);margin-top:2px}
+
+/* CAMPAIGN TABLE IN CARD */
+.camp-section{border-top:1px solid var(--border);padding-top:12px}
+.camp-title{font-size:11px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.camp-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
+.camp-row:last-child{border-bottom:none}
+.camp-name{font-size:11px;font-weight:600;color:var(--navy)}
+.camp-agent{font-size:10px;color:var(--text-3);margin-top:1px}
+.camp-metrics{display:flex;gap:12px;align-items:center}
+.camp-m{text-align:right}
+.camp-m-val{font-size:12px;font-weight:700;color:var(--navy);font-family:'DM Mono',monospace}
+.camp-m-lbl{font-size:9px;color:var(--text-3)}
+.camp-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px}
+.good{background:var(--success-bg);color:var(--success)}
+.warn{background:var(--warn-bg);color:var(--warn)}
+.neu{background:var(--accent-10);color:var(--accent)}
+
+/* COMPARISON SECTION */
+.comp-section{margin-bottom:18px}
+.comp-title{font-size:14px;font-weight:700;color:var(--navy);letter-spacing:-.3px;margin-bottom:12px}
+.comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.comp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;transition:box-shadow .15s}
+.comp-card:hover{box-shadow:var(--shadow-md)}
+.comp-ct{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.comp-cs{font-size:11px;color:var(--text-3);margin-bottom:12px}
+
+/* TREND SECTION */
+.trend-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:18px}
+.trend-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.trend-title{font-size:13px;font-weight:700;color:var(--navy)}
+.trend-sub{font-size:11px;color:var(--text-3);margin-top:2px}
+.lgd{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+.lgd-i{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:var(--text-2)}
+.lgd-ln{width:14px;height:2.5px;border-radius:2px}
+
+/* PRODUCER TABLE */
+.producer-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:18px}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{background:var(--navy);color:#fff;font-size:11px;font-weight:700;padding:9px 12px;text-align:left;white-space:nowrap}
+.tbl th:first-child{border-radius:var(--radius) 0 0 0}
+.tbl th:last-child{border-radius:0 var(--radius) 0 0}
+.tbl td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap}
+.tbl tr:nth-child(even) td{background:var(--surface-2)}
+.tbl tr:hover td{background:var(--blue-light)}
+.tbl .tot td{background:var(--navy-80)!important;color:#fff;font-weight:700}
+.num{font-family:'DM Mono',monospace;font-weight:500}
+.pg{font-weight:700;color:var(--success)}
+.pw{font-weight:700;color:var(--warn)}
+.pb{font-weight:700;color:var(--danger)}
+.pn{font-weight:700;color:var(--accent)}
+.pill-sm{font-size:10px;font-weight:700;padding:2px 7px;border-radius:7px}
+.p-ind{background:var(--blue-light);color:var(--blue)}
+.t-up{color:var(--success);font-weight:700}
+.t-dn{color:var(--danger);font-weight:700}
+.t-fl{color:var(--text-3);font-weight:700}
+
+/* ALERT */
+.alert-new{background:var(--success-bg);border:1px solid rgba(26,158,92,.3);color:#0a4027;border-radius:var(--radius);padding:9px 14px;margin-bottom:14px;font-size:12px;display:flex;align-items:center;gap:8px}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="brand-mark">
+    <div class="brand-pill pill-top"></div>
+    <div class="brand-pill pill-mid"></div>
+    <div class="brand-pill pill-bot"></div>
+  </div>
+  <span class="brand-name">Structurely</span>
+  <div class="nav-div"></div>
+  <span class="nav-ctx">BI Reporting Suite · Tableau Cloud</span>
+  <div class="nav-right">
+    <span class="nbadge nb-cert">✓ Aurora Read Replica</span>
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <div class="nav-avatar">SM</div>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <span class="bc-link">Platform Dashboard</span>
+  <span class="bc-sep">›</span>
+  <span class="bc-link">Account Scorecard</span>
+  <span class="bc-sep">›</span>
+  <span class="bc-current">West Capital Mortgage — Company View</span>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <span class="fl">Date</span>
+  <div class="date-range">
+    <div class="dw"><span style="font-size:12px">📅</span><span class="dd">Jan 1, 2026</span><span style="font-size:9px;color:var(--text-3)">▾</span></div>
+    <span class="darrow">→</span>
+    <div class="dw"><span class="dd">Mar 31, 2026</span><span style="font-size:9px;color:var(--text-3)">▾</span></div>
+  </div>
+  <div class="fsep"></div>
+  <select class="fsel"><option>All Lead Channels</option><option>Zillow</option><option>Past Clients</option><option>Data Leads</option></select>
+  <select class="fsel"><option>All Producers</option><option>Sarah Chen</option><option>Marcus Williams</option><option>Priya Patel</option><option>James O'Brien</option><option>Lena Torres</option></select>
+  <select class="fsel"><option>All Campaigns</option><option>Zillow — Agent A</option><option>Zillow — Agent B (Test)</option><option>Past Clients — Re-Engagement</option><option>Data Leads — Agent C</option></select>
+  <select class="fsel"><option>All Verticals</option><option>Mortgage — Lending</option><option>Mortgage — Recruiting</option></select>
+  <div class="toggle-wrap">
+    <div class="toggle on"></div>
+    <span class="tgl">Compare to Prior Period</span>
+  </div>
+  <div class="refresh-info"><div class="rdot"></div>Refreshed 3 min ago · 15-min cadence</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <!-- COMPANY HEADER CARD -->
+  <div class="company-header">
+    <div class="co-logo">🏦</div>
+    <div class="co-info">
+      <div class="co-name">West Capital Mortgage</div>
+      <div class="co-meta">
+        <span class="co-badge cb-ent">Enterprise</span>
+        <span class="co-badge cb-co">Company</span>
+        <span class="co-badge cb-hub">HubSpot Synced</span>
+        <span class="co-meta-text">5 Active Producers · 2 Teams · 3 Lead Channels · 4 Active Campaigns</span>
+      </div>
+    </div>
+    <div class="co-stats">
+      <div class="co-stat"><div class="co-stat-val">3,950</div><div class="co-stat-lbl">Leads Enrolled</div></div>
+      <div class="co-stat-div"></div>
+      <div class="co-stat"><div class="co-stat-val">5.2%</div><div class="co-stat-lbl">Fund Rate</div></div>
+      <div class="co-stat-div"></div>
+      <div class="co-stat"><div class="co-stat-val">205</div><div class="co-stat-lbl">Loans Funded</div></div>
+      <div class="co-stat-div"></div>
+      <div class="co-stat"><div class="co-stat-val">76.1%</div><div class="co-stat-lbl">Accepted Rate</div></div>
+    </div>
+  </div>
+
+  <!-- ROLLUP KPI ROW -->
+  <div class="rollup-row">
+    <div class="rk" style="--c:var(--navy)"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--navy);border-radius:var(--radius-lg) var(--radius-lg) 0 0"></div><div class="rk-lbl">Leads Received</div><div class="rk-val">3,958</div><div class="rk-sub"><span class="tr t-up">↑ +8.4%</span></div></div>
+    <div class="rk"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);border-radius:var(--radius-lg) var(--radius-lg) 0 0"></div><div class="rk-lbl">Leads Enrolled</div><div class="rk-val">3,950</div><div class="rk-sub"><span style="color:var(--text-2);font-weight:600">Enroll Rate 99.8%</span></div></div>
+    <div class="rk"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue);border-radius:var(--radius-lg) var(--radius-lg) 0 0"></div><div class="rk-lbl">Connected</div><div class="rk-val">1,960</div><div class="rk-sub"><span style="color:var(--text-2);font-weight:600">Connect Rate 17.3%</span></div></div>
+    <div class="rk"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--teal);border-radius:var(--radius-lg) var(--radius-lg) 0 0"></div><div class="rk-lbl">Transfers Attempted</div><div class="rk-val">775</div><div class="rk-sub"><span class="tr t-up">↑ +1.1pp</span></div></div>
+    <div class="rk"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--success);border-radius:var(--radius-lg) var(--radius-lg) 0 0"></div><div class="rk-lbl">Transfer Accepted</div><div class="rk-val">590</div><div class="rk-sub"><span style="color:var(--text-2);font-weight:600">Acc. Rate 76.1%</span><span class="tr t-up">↑ +1.8pp</span></div></div>
+    <div class="rk"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--warn);border-radius:var(--radius-lg) var(--radius-lg) 0 0"></div><div class="rk-lbl">Loans Funded</div><div class="rk-val">205</div><div class="rk-sub"><span style="color:var(--text-2);font-weight:600">Fund Rate 5.2%</span><span class="tr t-up">↑ +0.4pp</span></div></div>
+  </div>
+
+  <!-- THREE CHANNEL COLUMNS -->
+  <div class="alert-new">★ Lead Channel view — showing all 3 active channels side by side. Fund Rate = Loans Funded ÷ Leads Enrolled per channel. Accepted Rate = Transfer Accepted ÷ Transfers Attempted per channel.</div>
+  <div class="channels-label">Lead Channel Performance — Side by Side <span>Click any channel card to drill into campaign-level detail</span></div>
+
+  <div class="channels-grid">
+
+    <!-- ZILLOW -->
+    <div class="channel-card">
+      <div class="ch-header zillow">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="ch-icon zillow">🏠</div>
+          <div>
+            <div class="ch-name">Zillow</div>
+            <div class="ch-sub">Lead Buy Provider · 2 Active Campaigns</div>
+          </div>
+        </div>
+        <span class="ch-count cc-zillow">2,180 enrolled</span>
+      </div>
+      <div class="ch-body">
+        <!-- Mini Funnel -->
+        <div class="mini-funnel">
+          <div class="mf-row">
+            <div class="mf-label">Enrolled</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:100%;background:#3c4568">2,180</div></div>
+            <div class="mf-val">2,180</div>
+            <div class="mf-pct" style="color:var(--text-3)">—</div>
+          </div>
+          <div class="mf-drop"><span class="mf-drop-txt">↓ 1,190 no contact</span></div>
+          <div class="mf-row">
+            <div class="mf-label">Contacted</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:45.4%;background:#006aff">990</div></div>
+            <div class="mf-val">990</div>
+            <div class="mf-pct" style="color:var(--accent)">45.4%</div>
+          </div>
+          <div class="mf-drop"><span class="mf-drop-txt">↓ 554 not qualified</span></div>
+          <div class="mf-row">
+            <div class="mf-label">Xfer Attempted</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:20.0%;background:var(--teal)">436</div></div>
+            <div class="mf-val">436</div>
+            <div class="mf-pct" style="color:var(--teal)">20.0%</div>
+          </div>
+          <div class="mf-drop"><span class="mf-drop-txt">↓ 105 not accepted</span></div>
+          <div class="mf-row">
+            <div class="mf-label">Xfer Accepted</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:15.2%;background:var(--success)">331</div></div>
+            <div class="mf-val">331</div>
+            <div class="mf-pct" style="color:var(--success)">15.2%</div>
+          </div>
+          <div class="mf-drop"><span class="mf-drop-txt">↓ 223 not funded</span></div>
+          <div class="mf-row">
+            <div class="mf-label">Loans Funded</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:5.0%;background:var(--warn);min-width:32px">108</div></div>
+            <div class="mf-val">108</div>
+            <div class="mf-pct" style="color:var(--warn)">5.0%</div>
+          </div>
+        </div>
+
+        <!-- KPI Chips -->
+        <div class="ch-kpis">
+          <div class="kpi-chip"><div class="kc-lbl">Connect Rate</div><div class="kc-val">16.8%</div><div class="kc-sub"><span class="tr t-up" style="font-size:9px">↑ +0.8pp</span></div></div>
+          <div class="kpi-chip"><div class="kc-lbl">Accepted Rate</div><div class="kc-val">75.9%</div><div class="kc-sub"><span class="tr t-flat" style="font-size:9px">→ Stable</span></div></div>
+          <div class="kpi-chip"><div class="kc-lbl">Fund Rate</div><div class="kc-val">5.0%</div><div class="kc-sub" style="color:var(--text-3)">Funded ÷ Enrolled</div></div>
+          <div class="kpi-chip"><div class="kc-lbl">Opt-Out Rate</div><div class="kc-val">4.8%</div><div class="kc-sub"><span class="tr t-warn" style="font-size:9px">⚠ Above 3%</span></div></div>
+        </div>
+
+        <!-- Campaigns -->
+        <div class="camp-section">
+          <div class="camp-title">Active Campaigns</div>
+          <div class="camp-row">
+            <div>
+              <div class="camp-name">Zillow — Agent A</div>
+              <div class="camp-agent">Call → Text → Email · Lending</div>
+            </div>
+            <div class="camp-metrics">
+              <div class="camp-m"><div class="camp-m-val">1,340</div><div class="camp-m-lbl">Enrolled</div></div>
+              <div class="camp-m"><div class="camp-m-val">5.2%</div><div class="camp-m-lbl">Fund Rate</div></div>
+              <span class="camp-badge good">Primary</span>
+            </div>
+          </div>
+          <div class="camp-row">
+            <div>
+              <div class="camp-name">Zillow — Agent B</div>
+              <div class="camp-agent">Text → Call → Email · A/B Test</div>
+            </div>
+            <div class="camp-metrics">
+              <div class="camp-m"><div class="camp-m-val">840</div><div class="camp-m-lbl">Enrolled</div></div>
+              <div class="camp-m"><div class="camp-m-val">4.6%</div><div class="camp-m-lbl">Fund Rate</div></div>
+              <span class="camp-badge warn">A/B Test</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAST CLIENTS -->
+    <div class="channel-card">
+      <div class="ch-header past">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="ch-icon past">⭐</div>
+          <div>
+            <div class="ch-name">Past Clients</div>
+            <div class="ch-sub">Existing Database · 1 Active Campaign</div>
+          </div>
+        </div>
+        <span class="ch-count cc-past">620 enrolled</span>
+      </div>
+      <div class="ch-body">
+        <!-- Mini Funnel -->
+        <div class="mini-funnel">
+          <div class="mf-row">
+            <div class="mf-label">Enrolled</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:100%;background:#3c4568">620</div></div>
+            <div class="mf-val">620</div>
+            <div class="mf-pct" style="color:var(--text-3)">—</div>
+          </div>
+          <div class="mf-drop"><span class="mf-drop-txt">↓ 186 no contact</span></div>
+          <div class="mf-row">
+            <div class="mf-label">Contacted</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:70.0%;background:#1a9e5c">434</div></div>
+            <div class="mf-val">434</div>
+            <div class="mf-pct" style="color:var(--success)">70.0%</div>
+          </div>
+          <div class="mf-drop"><span class="mf-drop-txt">↓ 286 not qualified</span></div>
+          <div class="mf-row">
+            <div class="mf-label">Xfer Attempted</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:23.9%;background:var(--teal)">148</div></div>
+            <div class="mf-val">148</div>
+            <div class="mf-pct" style="color:var(--teal)">23.9%</div>
+          </div>
+          <div class="mf-drop"><span class="mf-drop-txt">↓ 30 not accepted</span></div>
+          <div class="mf-row">
+            <div class="mf-label">Xfer Accepted</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:19.0%;background:var(--success)">118</div></div>
+            <div class="mf-val">118</div>
+            <div class="mf-pct" style="color:var(--success)">19.0%</div>
+          </div>
+          <div class="mf-drop"><span class="mf-drop-txt">↓ 63 not funded</span></div>
+          <div class="mf-row">
+            <div class="mf-label">Loans Funded</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:8.9%;background:var(--warn);min-width:32px">55</div></div>
+            <div class="mf-val">55</div>
+            <div class="mf-pct" style="color:var(--success)">8.9%</div>
+          </div>
+        </div>
+
+        <!-- KPI Chips -->
+        <div class="ch-kpis">
+          <div class="kpi-chip"><div class="kc-lbl">Connect Rate</div><div class="kc-val">22.4%</div><div class="kc-sub"><span class="tr t-up" style="font-size:9px">↑ +2.1pp</span></div></div>
+          <div class="kpi-chip"><div class="kc-lbl">Accepted Rate</div><div class="kc-val">79.7%</div><div class="kc-sub"><span class="tr t-up" style="font-size:9px">↑ +1.2pp</span></div></div>
+          <div class="kpi-chip"><div class="kc-lbl">Fund Rate</div><div class="kc-val" style="color:var(--success)">8.9%</div><div class="kc-sub" style="color:var(--success);font-weight:600">Best channel ↑</div></div>
+          <div class="kpi-chip"><div class="kc-lbl">Opt-Out Rate</div><div class="kc-val">1.2%</div><div class="kc-sub"><span class="tr t-up" style="font-size:9px">✓ Below 3%</span></div></div>
+        </div>
+
+        <!-- Campaigns -->
+        <div class="camp-section">
+          <div class="camp-title">Active Campaigns</div>
+          <div class="camp-row">
+            <div>
+              <div class="camp-name">Past Clients — Re-Engagement</div>
+              <div class="camp-agent">Text → Email → Call · Lending</div>
+            </div>
+            <div class="camp-metrics">
+              <div class="camp-m"><div class="camp-m-val">620</div><div class="camp-m-lbl">Enrolled</div></div>
+              <div class="camp-m"><div class="camp-m-val">8.9%</div><div class="camp-m-lbl">Fund Rate</div></div>
+              <span class="camp-badge good">Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA LEADS -->
+    <div class="channel-card">
+      <div class="ch-header data">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="ch-icon data">📋</div>
+          <div>
+            <div class="ch-name">Data Leads</div>
+            <div class="ch-sub">Trigger Leads / List · 1 Active Campaign</div>
+          </div>
+        </div>
+        <span class="ch-count cc-data">1,150 enrolled</span>
+      </div>
+      <div class="ch-body">
+        <!-- Mini Funnel -->
+        <div class="mini-funnel">
+          <div class="mf-row">
+            <div class="mf-label">Enrolled</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:100%;background:#3c4568">1,150</div></div>
+            <div class="mf-val">1,150</div>
+            <div class="mf-pct" style="color:var(--text-3)">—</div>
+          </div>
+          <div class="mf-drop"><span class="mf-drop-txt">↓ 616 no contact</span></div>
+          <div class="mf-row">
+            <div class="mf-label">Contacted</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:46.4%;background:var(--warn)">534</div></div>
+            <div class="mf-val">534</div>
+            <div class="mf-pct" style="color:var(--warn)">46.4%</div>
+          </div>
+          <div class="mf-drop"><span class="mf-drop-txt">↓ 343 not qualified</span></div>
+          <div class="mf-row">
+            <div class="mf-label">Xfer Attempted</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:16.6%;background:var(--teal)">191</div></div>
+            <div class="mf-val">191</div>
+            <div class="mf-pct" style="color:var(--teal)">16.6%</div>
+          </div>
+          <div class="mf-drop"><span class="mf-drop-txt">↓ 50 not accepted</span></div>
+          <div class="mf-row">
+            <div class="mf-label">Xfer Accepted</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:12.3%;background:var(--success)">141</div></div>
+            <div class="mf-val">141</div>
+            <div class="mf-pct" style="color:var(--success)">12.3%</div>
+          </div>
+          <div class="mf-drop"><span class="mf-drop-txt">↓ 99 not funded</span></div>
+          <div class="mf-row">
+            <div class="mf-label">Loans Funded</div>
+            <div class="mf-bar-wrap"><div class="mf-bar" style="width:3.7%;background:var(--warn);min-width:32px">42</div></div>
+            <div class="mf-val">42</div>
+            <div class="mf-pct" style="color:var(--warn)">3.7%</div>
+          </div>
+        </div>
+
+        <!-- KPI Chips -->
+        <div class="ch-kpis">
+          <div class="kpi-chip"><div class="kc-lbl">Connect Rate</div><div class="kc-val">14.8%</div><div class="kc-sub"><span class="tr t-flat" style="font-size:9px">→ Stable</span></div></div>
+          <div class="kpi-chip"><div class="kc-lbl">Accepted Rate</div><div class="kc-val">73.8%</div><div class="kc-sub"><span class="tr t-dn" style="font-size:9px">↓ -1.1pp</span></div></div>
+          <div class="kpi-chip"><div class="kc-lbl">Fund Rate</div><div class="kc-val" style="color:var(--warn)">3.7%</div><div class="kc-sub" style="color:var(--warn);font-weight:600">Lowest channel</div></div>
+          <div class="kpi-chip"><div class="kc-lbl">Opt-Out Rate</div><div class="kc-val">5.8%</div><div class="kc-sub"><span class="tr t-warn" style="font-size:9px">⚠ Above 3%</span></div></div>
+        </div>
+
+        <!-- Campaigns -->
+        <div class="camp-section">
+          <div class="camp-title">Active Campaigns</div>
+          <div class="camp-row">
+            <div>
+              <div class="camp-name">Data Leads — Agent C</div>
+              <div class="camp-agent">Call → Text · Lending</div>
+            </div>
+            <div class="camp-metrics">
+              <div class="camp-m"><div class="camp-m-val">1,150</div><div class="camp-m-lbl">Enrolled</div></div>
+              <div class="camp-m"><div class="camp-m-val">3.7%</div><div class="camp-m-lbl">Fund Rate</div></div>
+              <span class="camp-badge warn">Monitor</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARISON CHARTS -->
+  <div class="comp-section">
+    <div class="comp-title">Channel Comparison — Key Rates</div>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="comp-ct">Fund Rate by Channel</div>
+        <div class="comp-cs">Loans Funded ÷ Leads Enrolled · Best indicator of channel ROI</div>
+        <canvas id="cmpFund" height="130"></canvas>
+      </div>
+      <div class="comp-card">
+        <div class="comp-ct">Connect Rate by Channel</div>
+        <div class="comp-cs">Answered by Human ÷ Calls Made · Past Clients convert at higher rates</div>
+        <canvas id="cmpConn" height="130"></canvas>
+      </div>
+      <div class="comp-card">
+        <div class="comp-ct">Accepted Rate by Channel</div>
+        <div class="comp-cs">Transfer Accepted ÷ Transfers Attempted · Handoff effectiveness</div>
+        <canvas id="cmpAcc" height="130"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKLY TREND -->
+  <div class="trend-card">
+    <div class="trend-header">
+      <div>
+        <div class="trend-title">Weekly Enrolled Trend — All 3 Channels</div>
+        <div class="trend-sub">Leads Enrolled per week · Hover to compare channels · Jan–Mar 2026</div>
+      </div>
+    </div>
+    <canvas id="trendAll" height="90"></canvas>
+    <div class="lgd">
+      <div class="lgd-i"><div class="lgd-ln" style="background:#006aff"></div>Zillow</div>
+      <div class="lgd-i"><div class="lgd-ln" style="background:var(--success)"></div>Past Clients</div>
+      <div class="lgd-i"><div class="lgd-ln" style="background:var(--warn)"></div>Data Leads</div>
+    </div>
+  </div>
+
+  <!-- PRODUCER BREAKDOWN -->
+  <div class="producer-card">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;letter-spacing:-.3px">Individual Producer Breakdown — West Capital Mortgage</div>
+    <div style="overflow-x:auto"><table class="tbl">
+      <thead><tr><th>Producer</th><th>Level</th><th>Zillow Enrolled</th><th>Zillow Fund%</th><th>Past Clients Enrolled</th><th>Past Clients Fund%</th><th>Data Leads Enrolled</th><th>Data Leads Fund%</th><th>Total Enrolled</th><th>Overall Fund Rate</th><th>Trend</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Sarah Chen</strong></td><td><span class="pill-sm p-ind">Individual</span></td><td class="num">520</td><td class="pg">5.4%</td><td class="num">180</td><td class="pg">9.4%</td><td class="num">310</td><td class="pw">3.9%</td><td class="num">1,010</td><td class="pg">5.5%</td><td class="t-up">↑</td></tr>
+        <tr><td><strong>Marcus Williams</strong></td><td><span class="pill-sm p-ind">Individual</span></td><td class="num">410</td><td class="pg">5.1%</td><td class="num">140</td><td class="pg">8.6%</td><td class="num">230</td><td class="pw">3.5%</td><td class="num">780</td><td class="pn">5.0%</td><td class="t-fl">→</td></tr>
+        <tr><td><strong>Priya Patel</strong></td><td><span class="pill-sm p-ind">Individual</span></td><td class="num">480</td><td class="pg">5.2%</td><td class="num">160</td><td class="pg">8.8%</td><td class="num">280</td><td class="pw">3.6%</td><td class="num">920</td><td class="pn">5.1%</td><td class="t-fl">→</td></tr>
+        <tr><td><strong>James O'Brien</strong></td><td><span class="pill-sm p-ind">Individual</span></td><td class="num">380</td><td class="pw">4.7%</td><td class="num">80</td><td class="pg">8.8%</td><td class="num">190</td><td class="pb">3.2%</td><td class="num">650</td><td class="pw">4.8%</td><td class="t-dn">↓</td></tr>
+        <tr><td><strong>Lena Torres</strong></td><td><span class="pill-sm p-ind">Individual</span></td><td class="num">390</td><td class="pg">5.0%</td><td class="num">60</td><td class="pg">8.3%</td><td class="num">140</td><td class="pw">3.6%</td><td class="num">590</td><td class="pn">5.0%</td><td class="t-up">↑</td></tr>
+        <tr class="tot"><td>TOTAL</td><td>—</td><td class="num">2,180</td><td class="num">5.0%</td><td class="num">620</td><td class="num">8.9%</td><td class="num">1,150</td><td class="num">3.7%</td><td class="num">3,950</td><td class="num">5.2%</td><td>—</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+const C={navy:'#1E2538',blue:'#3B6CB5',accent:'#4B7BFF',purple:'#7C5CFC',
+  teal:'#0ea5e9',success:'#1a9e5c',warn:'#d97706',danger:'#d94040',muted:'#8691b0',
+  zillow:'#006aff',past:'#1a9e5c',data:'#d97706'};
+
+const CNAMES=['Zillow','Past Clients','Data Leads'];
+const COLORS=[C.zillow,C.past,C.data];
+
+const base=()=>({responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(30,37,56,.92)',
+    titleColor:'#fff',bodyColor:'rgba(255,255,255,.8)',padding:10,cornerRadius:8,
+    titleFont:{family:'DM Sans',weight:'700',size:12},bodyFont:{family:'DM Sans',size:11}}},
+  scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10},color:C.muted}},
+          y:{grid:{color:'#eef0f6'},ticks:{font:{family:'DM Sans',size:10},color:C.muted}}}});
+
+// Fund Rate comparison
+new Chart(document.getElementById('cmpFund'),{type:'bar',
+  data:{labels:CNAMES,datasets:[{data:[5.0,8.9,3.7],backgroundColor:COLORS.map(c=>c+'cc'),borderRadius:5,borderSkipped:false}]},
+  options:{...base(),plugins:{...base().plugins},scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10},color:C.muted}},y:{grid:{color:'#eef0f6'},ticks:{font:{family:'DM Sans',size:10},color:C.muted,callback:v=>v+'%'}}}}});
+
+// Connect Rate
+new Chart(document.getElementById('cmpConn'),{type:'bar',
+  data:{labels:CNAMES,datasets:[{data:[16.8,22.4,14.8],backgroundColor:COLORS.map(c=>c+'cc'),borderRadius:5,borderSkipped:false}]},
+  options:{...base(),scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10},color:C.muted}},y:{grid:{color:'#eef0f6'},ticks:{font:{family:'DM Sans',size:10},color:C.muted,callback:v=>v+'%'}}}}});
+
+// Accepted Rate
+new Chart(document.getElementById('cmpAcc'),{type:'bar',
+  data:{labels:CNAMES,datasets:[{data:[75.9,79.7,73.8],backgroundColor:COLORS.map(c=>c+'cc'),borderRadius:5,borderSkipped:false}]},
+  options:{...base(),scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10},color:C.muted}},y:{min:65,max:85,grid:{color:'#eef0f6'},ticks:{font:{family:'DM Sans',size:10},color:C.muted,callback:v=>v+'%'}}}}});
+
+// Weekly Trend
+const WKS=['Jan W1','Jan W2','Jan W3','Jan W4','Feb W1','Feb W2','Feb W3','Feb W4','Mar W1','Mar W2','Mar W3','Mar W4'];
+new Chart(document.getElementById('trendAll'),{type:'line',
+  data:{labels:WKS,datasets:[
+    {label:'Zillow',data:[168,178,215,185,198,213,188,205,215,192,208,215],borderColor:C.zillow,fill:false,tension:.4,pointRadius:3,borderWidth:2.5,pointBackgroundColor:C.zillow},
+    {label:'Past Clients',data:[42,48,58,50,54,58,50,55,58,52,56,49],borderColor:C.past,fill:false,tension:.4,pointRadius:3,borderWidth:2.5,pointBackgroundColor:C.past},
+    {label:'Data Leads',data:[88,94,115,98,108,118,102,112,118,108,115,94],borderColor:C.data,fill:false,tension:.4,pointRadius:3,borderWidth:2.5,pointBackgroundColor:C.data},
+  ]},
+  options:{...base(),interaction:{mode:'index',intersect:false},
+    plugins:{...base().plugins,legend:{display:false}}}});
+</script>
+</body>
+</html>
