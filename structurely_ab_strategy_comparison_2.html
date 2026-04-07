@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Structurely — Campaign A/B Contact Strategy Comparison</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --navy:#1E2538;--navy-80:#2d3450;--blue:#3B6CB5;--blue-light:#e8eef8;
+  --accent:#4B7BFF;--accent-10:#eef1ff;--purple:#7C5CFC;--purple-10:#f1eeff;
+  --success:#1a9e5c;--success-bg:#e6f7ee;
+  --warn:#d97706;--warn-bg:#fef3cd;
+  --danger:#d94040;--danger-bg:#fce8e8;
+  --call:#3B6CB5;--call-bg:#e8eef8;
+  --text-ch:#7C5CFC;--text-bg:#f1eeff;
+  --email:#10b981;--email-bg:#d1fae5;
+  --bg:#f0f2f6;--surface:#fff;--surface-2:#f6f7fb;
+  --border:#dde2ef;--text-1:#1E2538;--text-2:#4a5270;--text-3:#8691b0;
+  --a-color:#4B7BFF;--b-color:#7C5CFC;
+  --radius:8px;--radius-lg:12px;
+  --shadow:0 1px 4px rgba(30,37,56,.10),0 0 0 1px rgba(30,37,56,.06);
+  --shadow-md:0 4px 16px rgba(30,37,56,.14),0 0 0 1px rgba(30,37,56,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);font-size:13px;min-height:100vh}
+
+/* NAV */
+.top-nav{background:var(--navy);height:52px;display:flex;align-items:center;padding:0 24px;gap:14px;box-shadow:0 2px 12px rgba(30,37,56,.4)}
+.brand-mark{display:flex;flex-direction:column;gap:3px}
+.brand-pill{height:7px;border-radius:3.5px}
+.pill-top{width:18px;margin-left:9px;background:var(--accent)}
+.pill-mid{width:21px;margin-left:3px;background:#3B6CB5}
+.pill-bot{width:18px;background:#7C5CFC}
+.brand-name{font-weight:700;font-size:16px;color:#fff;letter-spacing:-.8px}
+.nav-div{width:1px;height:22px;background:rgba(255,255,255,.18)}
+.nav-ctx{color:rgba(255,255,255,.5);font-size:12px;font-weight:500}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nbadge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;background:rgba(75,123,255,.18);color:var(--accent);border:1px solid rgba(75,123,255,.3)}
+
+/* BREADCRUMB */
+.breadcrumb{background:var(--surface);border-bottom:1px solid var(--border);padding:9px 24px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-3)}
+.bc-link{color:var(--blue);cursor:pointer;font-weight:500}
+.bc-sep{color:var(--border);font-size:14px}
+.bc-current{font-weight:700;color:var(--navy)}
+
+/* MAIN */
+.main{padding:20px 24px;max-width:1400px;margin:0 auto}
+
+/* EXPERIMENT HEADER */
+.exp-header{background:var(--navy);border-radius:var(--radius-lg);padding:18px 22px;margin-bottom:18px;display:flex;align-items:center;gap:20px}
+.exp-icon{width:44px;height:44px;border-radius:10px;background:rgba(75,123,255,.25);border:2px solid rgba(75,123,255,.4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.exp-info{flex:1}
+.exp-name{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.4px;margin-bottom:4px}
+.exp-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.exp-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px}
+.eb-test{background:rgba(124,92,252,.3);color:#c4b5fd;border:1px solid rgba(124,92,252,.4)}
+.eb-leads{background:rgba(75,123,255,.25);color:var(--accent);border:1px solid rgba(75,123,255,.4)}
+.eb-att{background:rgba(26,158,92,.25);color:#5dda9e;border:1px solid rgba(26,158,92,.4)}
+.eb-ch{background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.2)}
+.exp-stat{text-align:right}
+.exp-stat-val{font-size:13px;font-weight:700;color:#fff;font-family:'DM Mono',monospace}
+.exp-stat-lbl{font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em}
+
+/* LEGEND */
+.ch-legend{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.cl-item{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 12px}
+.cl-dot{width:10px;height:10px;border-radius:50%}
+.cl-label{font-size:11px;font-weight:600;color:var(--text-2)}
+
+/* SPLIT LAYOUT */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+
+/* CAMPAIGN CARD */
+.camp-card{background:var(--surface);border-radius:var(--radius-lg);border:2px solid var(--border);overflow:hidden;transition:box-shadow .15s}
+.camp-card:hover{box-shadow:var(--shadow-md)}
+.camp-card.a{border-color:rgba(75,123,255,.4)}
+.camp-card.b{border-color:rgba(124,92,252,.4)}
+
+.camp-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.camp-header.a{background:linear-gradient(135deg,#eef1ff,#dde6ff)}
+.camp-header.b{background:linear-gradient(135deg,#f1eeff,#e4d9ff)}
+.camp-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
+.camp-label.a{color:var(--a-color)}
+.camp-label.b{color:var(--b-color)}
+.camp-name{font-size:15px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
+.camp-strat{font-size:11px;color:var(--text-3);margin-top:2px}
+.camp-enrolled{font-size:11px;font-weight:700;padding:3px 10px;border-radius:8px}
+.ce-a{background:#eef1ff;color:var(--a-color);border:1px solid rgba(75,123,255,.3)}
+.ce-b{background:#f1eeff;color:var(--b-color);border:1px solid rgba(124,92,252,.3)}
+
+/* SEQUENCE STRIP */
+.seq-section{padding:14px 16px;border-bottom:1px solid var(--border)}
+.seq-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:10px}
+.seq-strip{display:flex;gap:5px;flex-wrap:wrap}
+.seq-step{display:flex;flex-direction:column;align-items:center;gap:3px;position:relative}
+.seq-num{font-size:9px;font-weight:700;color:var(--text-3);font-family:'DM Mono',monospace}
+.seq-bubble{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:2px solid transparent;position:relative;cursor:default;transition:transform .15s}
+.seq-bubble:hover{transform:scale(1.15)}
+.seq-bubble.call{background:var(--call-bg);border-color:var(--call);color:var(--call)}
+.seq-bubble.sms{background:var(--text-bg);border-color:var(--text-ch);color:var(--text-ch)}
+.seq-bubble.email{background:var(--email-bg);border-color:var(--email);color:var(--email)}
+.seq-connector{width:5px;height:2px;background:var(--border);margin-top:17px;flex-shrink:0}
+.seq-hit{position:absolute;top:-6px;right:-4px;width:14px;height:14px;border-radius:50%;background:var(--success);border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;font-weight:800}
+.seq-hit-label{font-size:8px;font-weight:700;color:var(--success);margin-top:1px}
+
+/* CONTACT WATERFALL */
+.waterfall-section{padding:14px 16px;border-bottom:1px solid var(--border)}
+.wf-title{font-size:11px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.wf-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.wf-step-label{width:72px;font-size:10px;font-weight:600;color:var(--text-3);text-align:right;flex-shrink:0;line-height:1.2}
+.wf-ch-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.wf-bar-wrap{flex:1;background:var(--bg);border-radius:3px;height:20px;overflow:hidden;position:relative}
+.wf-bar{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:#fff;transition:width .5s ease;min-width:0}
+.wf-bar.call{background:var(--call)}
+.wf-bar.sms{background:var(--text-ch)}
+.wf-bar.email{background:var(--email)}
+.wf-count{width:36px;font-size:11px;font-weight:700;color:var(--navy);font-family:'DM Mono',monospace;text-align:right;flex-shrink:0}
+.wf-pct{width:34px;font-size:10px;font-weight:700;text-align:right;flex-shrink:0}
+.wf-cumulative{width:44px;font-size:10px;color:var(--text-3);text-align:right;flex-shrink:0}
+.wf-conn{display:flex;align-items:center;gap:3px;margin-left:80px;margin-bottom:6px;margin-top:2px}
+.wf-conn-bar{height:4px;border-radius:2px}
+.wf-conn-label{font-size:9px;color:var(--text-3)}
+/* Conversion events */
+.conv-marker{display:flex;align-items:center;gap:6px;background:var(--success-bg);border:1px solid rgba(26,158,92,.3);border-radius:6px;padding:4px 10px;margin-left:80px;margin-bottom:4px}
+.conv-icon{font-size:11px}
+.conv-text{font-size:10px;font-weight:600;color:var(--success)}
+
+/* FUNNEL SUMMARY */
+.funnel-section{padding:14px 16px;border-bottom:1px solid var(--border)}
+.funnel-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.funnel-lbl{width:130px;font-size:11px;font-weight:500;color:var(--text-2);text-align:right;flex-shrink:0}
+.funnel-bar-wrap{flex:1;background:var(--bg);border-radius:3px;height:22px;overflow:hidden}
+.funnel-bar{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:#fff}
+.funnel-count{width:48px;font-size:12px;font-weight:700;color:var(--navy);font-family:'DM Mono',monospace;text-align:right;flex-shrink:0}
+.funnel-pct{width:40px;font-size:11px;font-weight:700;text-align:right;flex-shrink:0}
+.funnel-drop{display:flex;padding:1px 8px 3px 138px}
+.funnel-drop-txt{font-size:9px;color:var(--text-3)}
+
+/* KPI CHIPS */
+.kpi-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:14px 16px}
+.kc{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 11px}
+.kc-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:3px}
+.kc-val{font-size:16px;font-weight:700;color:var(--navy);font-family:'DM Mono',monospace;letter-spacing:-.3px;line-height:1}
+.kc-sub{font-size:10px;margin-top:2px}
+.good{color:var(--success);font-weight:700}
+.warn{color:var(--warn);font-weight:700}
+.neu{color:var(--accent);font-weight:700}
+
+/* WINNER BADGE */
+.winner-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
+.wb-a{background:var(--accent-10);color:var(--a-color);border:1px solid rgba(75,123,255,.3)}
+.wb-b{background:var(--purple-10);color:var(--b-color);border:1px solid rgba(124,92,252,.3)}
+
+/* COMPARISON TABLE */
+.comp-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:18px;margin-bottom:16px}
+.comp-title{font-size:14px;font-weight:700;color:var(--navy);letter-spacing:-.3px;margin-bottom:14px}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px}
+.comp-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);padding:7px 12px;text-align:left;border-bottom:2px solid var(--border)}
+.comp-table th.a-col{color:var(--a-color)}
+.comp-table th.b-col{color:var(--b-color)}
+.comp-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.comp-table tr:last-child td{border-bottom:none}
+.comp-table tr:hover td{background:var(--surface-2)}
+.metric-name{font-weight:600;color:var(--text-2)}
+.metric-desc{font-size:10px;color:var(--text-3);margin-top:1px}
+.num{font-family:'DM Mono',monospace;font-weight:600}
+.winner-cell{font-weight:700}
+.w-a{color:var(--a-color)}
+.w-b{color:var(--b-color)}
+.w-tie{color:var(--text-3)}
+.diff-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px}
+.diff-pos{background:var(--success-bg);color:var(--success)}
+.diff-neg{background:var(--danger-bg);color:var(--danger)}
+.diff-tie{background:var(--bg);color:var(--text-3)}
+
+/* INSIGHT CARD */
+.insight-card{background:linear-gradient(135deg,#eef1ff,#f1eeff);border:1px solid rgba(75,123,255,.2);border-radius:var(--radius-lg);padding:16px 20px}
+.insight-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.insight-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.insight-item{background:#fff;border-radius:var(--radius);padding:12px 14px;border:1px solid var(--border)}
+.ii-icon{font-size:18px;margin-bottom:6px}
+.ii-title{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.ii-body{font-size:11px;color:var(--text-2);line-height:1.4}
+.ii-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;margin-top:5px}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+  <div class="brand-mark">
+    <div class="brand-pill pill-top"></div>
+    <div class="brand-pill pill-mid"></div>
+    <div class="brand-pill pill-bot"></div>
+  </div>
+  <span class="brand-name">Structurely</span>
+  <div class="nav-div"></div>
+  <span class="nav-ctx">Campaign A/B · Contact Strategy Comparison</span>
+  <div class="nav-right">
+    <span class="nbadge">✓ Aurora Read Replica</span>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <span class="bc-link">Platform Dashboard</span>
+  <span class="bc-sep">›</span>
+  <span class="bc-link">Lead Channel Performance</span>
+  <span class="bc-sep">›</span>
+  <span class="bc-current">A/B Test — Zillow Leads · Call-First vs Text-First Contact Strategy</span>
+</div>
+
+<div class="main">
+
+  <!-- EXPERIMENT HEADER -->
+  <div class="exp-header">
+    <div class="exp-icon">🧪</div>
+    <div class="exp-info">
+      <div class="exp-name">A/B Test — Zillow Leads · Mortgage Lending · West Capital Mortgage</div>
+      <div class="exp-meta">
+        <span class="exp-badge eb-test">Active A/B Test</span>
+        <span class="exp-badge eb-leads">2,000 Total Leads · 1,000 per Variant</span>
+        <span class="exp-badge eb-att">12 Attempts per Lead</span>
+        <span class="exp-badge eb-ch">Call · Text · Email</span>
+        <span style="font-size:11px;color:rgba(255,255,255,.5)">Same AI Agent · Same Lead Source · Different Contact Strategy</span>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px">Jan 1 — Mar 31, 2026</div>
+      <div class="winner-badge wb-a">🏆 Campaign A Leading</div>
+    </div>
+  </div>
+
+  <!-- CHANNEL LEGEND -->
+  <div class="ch-legend">
+    <div class="cl-item"><div class="cl-dot" style="background:var(--call)"></div><span class="cl-label">📞 Call</span></div>
+    <div class="cl-item"><div class="cl-dot" style="background:var(--text-ch)"></div><span class="cl-label">💬 Text / SMS</span></div>
+    <div class="cl-item"><div class="cl-dot" style="background:var(--email)"></div><span class="cl-label">✉️ Email</span></div>
+    <div class="cl-item" style="border-color:var(--success)"><div class="cl-dot" style="background:var(--success)"></div><span class="cl-label" style="color:var(--success)">✓ Connection Made</span></div>
+    <div class="cl-item" style="border-color:var(--warn)"><div class="cl-dot" style="background:var(--warn)"></div><span class="cl-label" style="color:var(--warn)">⚡ Transfer Attempted</span></div>
+  </div>
+
+  <!-- TWO CAMPAIGN COLUMNS -->
+  <div class="split">
+
+    <!-- CAMPAIGN A: CALL FIRST -->
+    <div class="camp-card a">
+      <div class="camp-header a">
+        <div>
+          <div class="camp-label a">Campaign A — Call First</div>
+          <div class="camp-name">Zillow — Agent A · Call → Text → Email</div>
+          <div class="camp-strat">Sequence: C→T→C→T→E→C→T→C→E→T→C→T</div>
+        </div>
+        <span class="camp-enrolled ce-a">1,000 Leads</span>
+      </div>
+
+      <!-- SEQUENCE STRIP -->
+      <div class="seq-section">
+        <div class="seq-label">12-Attempt Contact Strategy — Campaign A</div>
+        <div class="seq-strip" id="seqA"></div>
+      </div>
+
+      <!-- CONTACT WATERFALL -->
+      <div class="waterfall-section">
+        <div class="wf-title">Outreach Waterfall — Where Connections Happen</div>
+        <div id="waterfallA"></div>
+      </div>
+
+      <!-- FUNNEL -->
+      <div class="funnel-section">
+        <div class="wf-title">Campaign Funnel</div>
+        <div id="funnelA"></div>
+      </div>
+
+      <!-- KPI CHIPS -->
+      <div class="kpi-strip">
+        <div class="kc"><div class="kc-lbl">Total Connected</div><div class="kc-val">213</div><div class="kc-sub good">21.3% connect rate</div></div>
+        <div class="kc"><div class="kc-lbl">Transfer Attempted</div><div class="kc-val">96</div><div class="kc-sub neu">9.6% of enrolled</div></div>
+        <div class="kc"><div class="kc-lbl">Avg Attempts to Connect</div><div class="kc-val">4.2</div><div class="kc-sub" style="color:var(--text-3)">of 12 max</div></div>
+        <div class="kc"><div class="kc-lbl">Opt-Out Rate</div><div class="kc-val">3.8%</div><div class="kc-sub warn">⚠ Above 3%</div></div>
+        <div class="kc"><div class="kc-lbl">Exhausted (12 att.)</div><div class="kc-val">787</div><div class="kc-sub" style="color:var(--text-3)">no connection</div></div>
+      </div>
+    </div>
+
+    <!-- CAMPAIGN B: TEXT FIRST -->
+    <div class="camp-card b">
+      <div class="camp-header b">
+        <div>
+          <div class="camp-label b">Campaign B — Text First</div>
+          <div class="camp-name">Zillow — Agent B · Text → Call → Email</div>
+          <div class="camp-strat">Sequence: T→C→T→C→E→T→C→T→E→C→T→C</div>
+        </div>
+        <span class="camp-enrolled ce-b">1,000 Leads</span>
+      </div>
+
+      <!-- SEQUENCE STRIP -->
+      <div class="seq-section">
+        <div class="seq-label">12-Attempt Contact Strategy — Campaign B</div>
+        <div class="seq-strip" id="seqB"></div>
+      </div>
+
+      <!-- CONTACT WATERFALL -->
+      <div class="waterfall-section">
+        <div class="wf-title">Outreach Waterfall — Where Connections Happen</div>
+        <div id="waterfallB"></div>
+      </div>
+
+      <!-- FUNNEL -->
+      <div class="funnel-section">
+        <div class="wf-title">Campaign Funnel</div>
+        <div id="funnelB"></div>
+      </div>
+
+      <!-- KPI CHIPS -->
+      <div class="kpi-strip">
+        <div class="kc"><div class="kc-lbl">Total Connected</div><div class="kc-val">184</div><div class="kc-sub warn">18.4% connect rate</div></div>
+        <div class="kc"><div class="kc-lbl">Transfer Attempted</div><div class="kc-val">78</div><div class="kc-sub neu">7.8% of enrolled</div></div>
+        <div class="kc"><div class="kc-lbl">Avg Attempts to Connect</div><div class="kc-val">5.1</div><div class="kc-sub" style="color:var(--text-3)">of 12 max</div></div>
+        <div class="kc"><div class="kc-lbl">Opt-Out Rate</div><div class="kc-val good">2.1%</div><div class="kc-sub good">✓ Below 3%</div></div>
+        <div class="kc"><div class="kc-lbl">Exhausted (12 att.)</div><div class="kc-val">816</div><div class="kc-sub" style="color:var(--text-3)">no connection</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARISON TABLE -->
+  <div class="comp-card">
+    <div class="comp-title">Head-to-Head Metric Comparison — 1,000 Leads Each</div>
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th style="width:220px">Metric</th>
+          <th class="a-col">Campaign A · Call First</th>
+          <th class="b-col">Campaign B · Text First</th>
+          <th>Difference</th>
+          <th>Winner</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><div class="metric-name">Leads Enrolled</div></td><td class="num">1,000</td><td class="num">1,000</td><td>—</td><td class="w-tie">Tied</td></tr>
+        <tr><td><div class="metric-name">Total Connected</div><div class="metric-desc">Confirmed human answer (call) or reply (text/email)</div></td><td class="num">213</td><td class="num">184</td><td><span class="diff-badge diff-pos">A +29</span></td><td class="winner-cell w-a">🏆 A</td></tr>
+        <tr><td><div class="metric-name">Connect Rate</div><div class="metric-desc">Connected leads ÷ enrolled leads</div></td><td class="num">21.3%</td><td class="num">18.4%</td><td><span class="diff-badge diff-pos">A +2.9pp</span></td><td class="winner-cell w-a">🏆 A</td></tr>
+        <tr><td><div class="metric-name">Avg Attempts to First Connect</div><div class="metric-desc">Lower = faster to connection</div></td><td class="num">4.2</td><td class="num">5.1</td><td><span class="diff-badge diff-pos">A faster</span></td><td class="winner-cell w-a">🏆 A</td></tr>
+        <tr><td><div class="metric-name">Connected via Call</div><div class="metric-desc">Human answer on call attempt</div></td><td class="num">162</td><td class="num">104</td><td><span class="diff-badge diff-pos">A +58</span></td><td class="winner-cell w-a">🏆 A</td></tr>
+        <tr><td><div class="metric-name">Connected via Text</div><div class="metric-desc">Lead replied to text</div></td><td class="num">38</td><td class="num">68</td><td><span class="diff-badge diff-neg">B +30</span></td><td class="winner-cell w-b">🏆 B</td></tr>
+        <tr><td><div class="metric-name">Connected via Email</div><div class="metric-desc">Lead replied to email</div></td><td class="num">13</td><td class="num">12</td><td><span class="diff-badge diff-tie">~Tied</span></td><td class="w-tie">—</td></tr>
+        <tr><td><div class="metric-name">Transfers Attempted</div></td><td class="num">96</td><td class="num">78</td><td><span class="diff-badge diff-pos">A +18</span></td><td class="winner-cell w-a">🏆 A</td></tr>
+        <tr><td><div class="metric-name">Transfer Accepted</div><div class="metric-desc">LO answered and engaged</div></td><td class="num">74</td><td class="num">60</td><td><span class="diff-badge diff-pos">A +14</span></td><td class="winner-cell w-a">🏆 A</td></tr>
+
+        <tr><td><div class="metric-name">Opt-Out Rate</div><div class="metric-desc">Lower is better</div></td><td class="num warn">3.8%</td><td class="num good">2.1%</td><td><span class="diff-badge diff-neg">B −1.7pp</span></td><td class="winner-cell w-b">🏆 B</td></tr>
+        <tr><td><div class="metric-name">Exhausted (0 connects in 12 att.)</div></td><td class="num">787</td><td class="num">816</td><td><span class="diff-badge diff-pos">A −29</span></td><td class="winner-cell w-a">🏆 A</td></tr>
+      </tbody>
+    </table>
+  </div>
+    <div style="font-size:11px;color:var(--text-3);margin-bottom:14px">Circle size = number of leads connected at that attempt. Color = outreach channel used.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" id="heatmapWrap"></div>
+  </div>
+
+  <!-- CAMPAIGN PIPELINE VIEW -->
+  <div class="comp-card">
+    <div class="comp-title">🔵 Campaign Pipeline View — Q1 2026 Cohort · Current status of all 2,000 enrolled leads</div>
+    <div style="font-size:11px;color:var(--text-3);margin-bottom:16px">Shows where each lead stands right now across both campaigns. All statuses sum to 1,000 enrolled per campaign.</div>
+
+    <!-- CAMPAIGN A PIPELINE -->
+    <div style="margin-bottom:16px;padding:16px;background:#f6f7fb;border-radius:10px;border:1px solid #dde2ef">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#3B6CB5">Campaign A — Call First · Zillow Agent A</div>
+          <div style="font-size:11px;color:#8691b0">Call → Text → Email · 1,000 enrolled · Q1 2026</div>
+        </div>
+        <div style="display:flex;gap:20px">
+          <div style="text-align:right"><div style="font-size:14px;font-weight:800;color:#1E2538;font-family:monospace">9.6%</div><div style="font-size:9px;color:#8691b0">Attempted Xfer Rate</div></div>
+          <div style="text-align:right"><div style="font-size:14px;font-weight:800;color:#1a9e5c;font-family:monospace">77.1%</div><div style="font-size:9px;color:#8691b0">Accepted Rate</div></div>
+        </div>
+      </div>
+      <div style="background:rgba(0,0,0,.06);border-radius:4px;height:28px;display:flex;overflow:hidden;margin-bottom:8px">
+        <div style="width:24.3%;background:#4B7BFF;height:100%;display:flex;align-items:center;padding:0 8px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap">In Sequence 243</div>
+        <div style="width:8.9%;background:#7C5CFC;height:100%;display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap">AI Queue 89</div>
+        <div style="width:7.4%;background:#1a9e5c;height:100%;display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap">Xferred 74</div>
+        <div style="width:21.3%;background:#d94040;height:100%;display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap">Opted Out 213 ⚠</div>
+        <div style="width:38.1%;background:#8691b0;height:100%;display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap">Seq. Exhausted 381</div>
+      </div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <span style="font-size:10px;color:#8691b0"><span style="color:#4B7BFF;font-weight:700">■</span> Active In Seq 243 (24.3%)</span>
+        <span style="font-size:10px;color:#8691b0"><span style="color:#7C5CFC;font-weight:700">■</span> AI Queue 89 (8.9%)</span>
+        <span style="font-size:10px;color:#8691b0"><span style="color:#1a9e5c;font-weight:700">■</span> Transferred 74 (7.4%)</span>
+        <span style="font-size:10px;color:#8691b0"><span style="color:#d94040;font-weight:700">■</span> Opted Out 213 (21.3%) — above 3% threshold</span>
+        <span style="font-size:10px;color:#8691b0"><span style="color:#8691b0;font-weight:700">■</span> Exhausted 381 (38.1%)</span>
+        <span style="font-size:10px;color:#8691b0;margin-left:auto">Total: 243+89+74+213+381 = 1,000 ✓</span>
+      </div>
+    </div>
+
+    <!-- CAMPAIGN B PIPELINE -->
+    <div style="padding:16px;background:#f6f7fb;border-radius:10px;border:1px solid #dde2ef">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#7C5CFC">Campaign B — Text First · Zillow Agent B</div>
+          <div style="font-size:11px;color:#8691b0">Text → Call → Email · 1,000 enrolled · Q1 2026</div>
+        </div>
+        <div style="display:flex;gap:20px">
+          <div style="text-align:right"><div style="font-size:14px;font-weight:800;color:#1E2538;font-family:monospace">7.8%</div><div style="font-size:9px;color:#8691b0">Attempted Xfer Rate</div></div>
+          <div style="text-align:right"><div style="font-size:14px;font-weight:800;color:#1a9e5c;font-family:monospace">76.9%</div><div style="font-size:9px;color:#8691b0">Accepted Rate</div></div>
+        </div>
+      </div>
+      <div style="background:rgba(0,0,0,.06);border-radius:4px;height:28px;display:flex;overflow:hidden;margin-bottom:8px">
+        <div style="width:26.2%;background:#4B7BFF;height:100%;display:flex;align-items:center;padding:0 8px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap">In Sequence 262</div>
+        <div style="width:10.2%;background:#7C5CFC;height:100%;display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap">AI Queue 102</div>
+        <div style="width:6.0%;background:#1a9e5c;height:100%;display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap">Xferred 60</div>
+        <div style="width:12.2%;background:#d94040;height:100%;display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap">Opted Out 122</div>
+        <div style="width:45.4%;background:#8691b0;height:100%;display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap">Seq. Exhausted 454</div>
+      </div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <span style="font-size:10px;color:#8691b0"><span style="color:#4B7BFF;font-weight:700">■</span> Active In Seq 262 (26.2%)</span>
+        <span style="font-size:10px;color:#8691b0"><span style="color:#7C5CFC;font-weight:700">■</span> AI Queue 102 (10.2%)</span>
+        <span style="font-size:10px;color:#8691b0"><span style="color:#1a9e5c;font-weight:700">■</span> Transferred 60 (6.0%)</span>
+        <span style="font-size:10px;color:#8691b0"><span style="color:#d94040;font-weight:700">■</span> Opted Out 122 (12.2%) — below 3% per-lead threshold</span>
+        <span style="font-size:10px;color:#8691b0"><span style="color:#8691b0;font-weight:700">■</span> Exhausted 454 (45.4%)</span>
+        <span style="font-size:10px;color:#8691b0;margin-left:auto">Total: 262+102+60+122+454 = 1,000 ✓</span>
+      </div>
+    </div>
+
+    <!-- PIPELINE COMPARISON INSIGHT -->
+    <div style="margin-top:14px;padding:12px 16px;background:#eef1ff;border-radius:8px;border:1px solid rgba(75,123,255,.2)">
+      <div style="font-size:11px;font-weight:700;color:#4B7BFF;margin-bottom:4px">📊 Pipeline Comparison</div>
+      <div style="font-size:11px;color:#4a5270;line-height:1.6">Campaign A has a higher opt-out rate (21.3% vs 12.2%) — a known trade-off of the call-first approach. Campaign B has more leads still active (26.2% + 10.2% = 36.4% active vs 24.3% + 8.9% = 33.2% for A), suggesting B has more pipeline remaining to convert. Campaign A leads in transfers accepted (74 vs 60). Combined active pipeline: <strong>593 leads</strong> still working across both campaigns.</div>
+    </div>
+  </div>
+
+
+</div><!-- /main -->
+
+<script>
+const C={navy:'#1E2538',call:'#3B6CB5',sms:'#7C5CFC',email:'#10b981',
+  success:'#1a9e5c',warn:'#d97706',muted:'#8691b0',
+  aColor:'#4B7BFF',bColor:'#7C5CFC'};
+
+// ── SEQUENCE DEFINITIONS ─────────────────────────────────
+// Campaign A: Call-first
+const seqA=[
+  {n:1,ch:'call'},{n:2,ch:'sms'},{n:3,ch:'call'},{n:4,ch:'sms'},
+  {n:5,ch:'email'},{n:6,ch:'call'},{n:7,ch:'sms'},{n:8,ch:'call'},
+  {n:9,ch:'email'},{n:10,ch:'sms'},{n:11,ch:'call'},{n:12,ch:'sms'}
+];
+// Campaign B: Text-first
+const seqB=[
+  {n:1,ch:'sms'},{n:2,ch:'call'},{n:3,ch:'sms'},{n:4,ch:'call'},
+  {n:5,ch:'email'},{n:6,ch:'sms'},{n:7,ch:'call'},{n:8,ch:'sms'},
+  {n:9,ch:'email'},{n:10,ch:'call'},{n:11,ch:'sms'},{n:12,ch:'call'}
+];
+
+// Connections per attempt (how many of the 1000 leads connected at this attempt)
+// Campaign A: 213 total connections
+const connA=[48,18,36,15,8,28,12,22,6,11,7,2]; // sum=213
+// Campaign B: 184 total connections
+const connB=[22,38,18,28,6,14,26,10,5,12,4,1]; // sum=184
+
+const chIcon={call:'📞',sms:'💬',email:'✉️'};
+const chLabel={call:'Call',sms:'Text',email:'Email'};
+const chColor={call:C.call,sms:C.sms,email:C.email};
+
+// ── RENDER SEQUENCE STRIP ─────────────────────────────────
+function renderSeq(containerId, seq, conns, color){
+  const el=document.getElementById(containerId);
+  seq.forEach((s,i)=>{
+    const hasConn=conns[i]>0;
+    const step=document.createElement('div');
+    step.className='seq-step';
+    step.title=`Attempt ${s.n}: ${chLabel[s.ch]}${hasConn?' · '+conns[i]+' connections':''}`;
+    step.innerHTML=`
+      <div class="seq-num">${s.n}</div>
+      <div class="seq-bubble ${s.ch}" style="${hasConn?'box-shadow:0 0 0 3px '+C.success+'40':''}">
+        ${chIcon[s.ch]}
+        ${hasConn?`<div class="seq-hit">✓</div>`:''}
+      </div>
+      <div class="seq-hit-label">${hasConn?conns[i]:''}</div>`;
+    el.appendChild(step);
+    if(i<seq.length-1){
+      const conn=document.createElement('div');
+      conn.className='seq-connector';
+      el.appendChild(conn);
+    }
+  });
+}
+renderSeq('seqA',seqA,connA,C.aColor);
+renderSeq('seqB',seqB,connB,C.bColor);
+
+// ── RENDER WATERFALL ──────────────────────────────────────
+// Group connections by channel + cumulative funnel
+function renderWaterfall(containerId, seq, conns){
+  const el=document.getElementById(containerId);
+  const maxConn=Math.max(...connA,...connB)*1.2;
+  let cumConnected=0;
+
+  // Aggregate by channel
+  const byChannel={call:0,sms:0,email:0};
+  seq.forEach((s,i)=>{byChannel[s.ch]+=conns[i];});
+
+  // Channel summary rows first
+  const chOrder=Object.entries(byChannel).sort((a,b)=>b[1]-a[1]);
+  const totalConn=chOrder.reduce((s,[,v])=>s+v,0);
+
+  // Section label
+  const lbl=document.createElement('div');
+  lbl.style.cssText='font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px';
+  lbl.textContent='Connections by Channel';
+  el.appendChild(lbl);
+
+  chOrder.forEach(([ch,count])=>{
+    const pct=totalConn>0?((count/1000)*100).toFixed(1):0;
+    const barW=totalConn>0?Math.max((count/totalConn)*100,0):0;
+    const row=document.createElement('div');
+    row.className='wf-row';
+    row.innerHTML=`
+      <div class="wf-step-label">${chIcon[ch]} ${chLabel[ch]}</div>
+      <div class="wf-ch-dot" style="background:${chColor[ch]}"></div>
+      <div class="wf-bar-wrap">
+        <div class="wf-bar ${ch}" style="width:${barW}%">${count>20?count:''}</div>
+      </div>
+      <div class="wf-count">${count}</div>
+      <div class="wf-pct" style="color:${chColor[ch]}">${pct}%</div>`;
+    el.appendChild(row);
+  });
+
+  // Attempt-level breakdown
+  const lbl2=document.createElement('div');
+  lbl2.style.cssText='font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-top:10px;margin-bottom:6px';
+  lbl2.textContent='Connections by Attempt';
+  el.appendChild(lbl2);
+
+  seq.forEach((s,i)=>{
+    const c=conns[i];
+    cumConnected+=c;
+    if(c===0) return; // only show attempts with connections
+    const barW=Math.max((c/maxConn)*100,0);
+    const isHighConversion=c>=25;
+    const isTransfer=i===0||i===2||i===5; // highlight first call attempts
+    const row=document.createElement('div');
+    row.className='wf-row';
+    row.innerHTML=`
+      <div class="wf-step-label">Att. ${s.n} · ${chIcon[s.ch]}</div>
+      <div class="wf-ch-dot" style="background:${chColor[s.ch]}"></div>
+      <div class="wf-bar-wrap">
+        <div class="wf-bar ${s.ch}" style="width:${barW}%">${c>15?c:''}</div>
+      </div>
+      <div class="wf-count">${c}</div>
+      <div class="wf-pct" style="color:${chColor[s.ch]}">${((c/1000)*100).toFixed(1)}%</div>`;
+    el.appendChild(row);
+    if(isHighConversion){
+      const conv=document.createElement('div');
+      conv.className='conv-marker';
+      conv.innerHTML=`<span class="conv-icon">⚡</span><span class="conv-text">High-connection attempt — ${c} leads reached · cumulative ${cumConnected} connected</span>`;
+      el.appendChild(conv);
+    }
+  });
+}
+renderWaterfall('waterfallA',seqA,connA);
+renderWaterfall('waterfallB',seqB,connB);
+
+// ── RENDER FUNNELS ────────────────────────────────────────
+function renderFunnel(containerId, data, color){
+  const el=document.getElementById(containerId);
+  const maxVal=data[0].val;
+  data.forEach((d,i)=>{
+    const barW=Math.max((d.val/maxVal)*100,2);
+    const row=document.createElement('div');
+    row.className='funnel-row';
+    row.innerHTML=`
+      <div class="funnel-lbl">${d.label}</div>
+      <div class="funnel-bar-wrap">
+        <div class="funnel-bar" style="width:${barW}%;background:${d.color||color}">${d.val>50?d.val:''}</div>
+      </div>
+      <div class="funnel-count">${d.val.toLocaleString()}</div>
+      <div class="funnel-pct" style="color:${d.color||color}">${d.pct}</div>`;
+    el.appendChild(row);
+    if(d.drop){
+      const drop=document.createElement('div');
+      drop.className='funnel-drop';
+      drop.innerHTML=`<span class="funnel-drop-txt">${d.drop}</span>`;
+      el.appendChild(drop);
+    }
+  });
+}
+
+renderFunnel('funnelA',[
+  {label:'Enrolled',val:1000,pct:'100%',color:'#3c4568',drop:'↓ 787 never connected in 12 attempts'},
+  {label:'Connected',val:213,pct:'21.3%',color:C.call,drop:'↓ 117 connected but not transferred'},
+  {label:'Xfer Attempted',val:96,pct:'9.6%',color:'#0ea5e9',drop:'↓ 22 not accepted by LO'},
+  {label:'Xfer Accepted',val:74,pct:'7.4%',color:C.success},
+], C.aColor);
+
+renderFunnel('funnelB',[
+  {label:'Enrolled',val:1000,pct:'100%',color:'#3c4568',drop:'↓ 816 never connected in 12 attempts'},
+  {label:'Connected',val:184,pct:'18.4%',color:C.sms,drop:'↓ 106 connected but not transferred'},
+  {label:'Xfer Attempted',val:78,pct:'7.8%',color:'#0ea5e9',drop:'↓ 18 not accepted by LO'},
+  {label:'Xfer Accepted',val:60,pct:'6.0%',color:C.success},
+], C.bColor);
+
+// ── CSS HEATMAP: CONNECTIONS BY ATTEMPT ──────────────────
+function renderHeatmap(parentEl, label, color, seq, conns){
+  const maxConn = Math.max(...connA, ...connB);
+  const wrap = document.createElement('div');
+
+  // Campaign label
+  const hdr = document.createElement('div');
+  hdr.style.cssText = `font-size:11px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px`;
+  hdr.textContent = label;
+  wrap.appendChild(hdr);
+
+  // Grid of attempt bubbles with size scaled to connections
+  const grid = document.createElement('div');
+  grid.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end';
+
+  seq.forEach((s, i) => {
+    const c = conns[i];
+    const pct = c / maxConn; // 0–1
+    const minSize = 28, maxSize = 64;
+    const size = c === 0 ? minSize : Math.round(minSize + pct * (maxSize - minSize));
+    const bgColor = chColor[s.ch];
+    const opacity = c === 0 ? 0.12 : 0.15 + pct * 0.7;
+    const isTop = c === Math.max(...conns);
+
+    const cell = document.createElement('div');
+    cell.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:3px';
+    cell.title = `Attempt ${s.n} · ${chLabel[s.ch]} · ${c} connections`;
+
+    const bubble = document.createElement('div');
+    bubble.style.cssText = `
+      width:${size}px;height:${size}px;border-radius:50%;
+      background:${bgColor};opacity:${opacity > 1 ? 1 : opacity};
+      display:flex;align-items:center;justify-content:center;
+      font-size:${size > 44 ? 12 : 10}px;font-weight:700;color:#fff;
+      border:2px solid ${c > 0 ? bgColor : 'transparent'};
+      position:relative;transition:transform .15s;cursor:default;
+      box-shadow:${isTop ? '0 0 0 3px ' + bgColor + '40' : 'none'};
+    `;
+    bubble.style.opacity = c === 0 ? '0.2' : Math.min(0.3 + pct * 0.7, 1);
+    bubble.textContent = c > 0 ? c : '';
+    bubble.onmouseenter = () => bubble.style.transform = 'scale(1.1)';
+    bubble.onmouseleave = () => bubble.style.transform = 'scale(1)';
+
+    const attNum = document.createElement('div');
+    attNum.style.cssText = `font-size:9px;font-weight:700;color:${c > 0 ? '#4a5270' : '#c8cfe0'};font-family:'DM Mono',monospace`;
+    attNum.textContent = `${s.n}`;
+
+    const chLbl = document.createElement('div');
+    chLbl.style.cssText = `font-size:8px;font-weight:600;color:${c > 0 ? bgColor : '#c8cfe0'}`;
+    chLbl.textContent = chIcon[s.ch];
+
+    cell.appendChild(bubble);
+    cell.appendChild(attNum);
+    cell.appendChild(chLbl);
+    grid.appendChild(cell);
+  });
+  wrap.appendChild(grid);
+
+  // Channel summary strip below
+  const summary = document.createElement('div');
+  summary.style.cssText = 'display:flex;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap';
+  const byChannel = {call:0, sms:0, email:0};
+  seq.forEach((s,i) => { byChannel[s.ch] += conns[i]; });
+  const total = Object.values(byChannel).reduce((a,b)=>a+b,0);
+
+  Object.entries(byChannel).sort((a,b)=>b[1]-a[1]).forEach(([ch, cnt]) => {
+    const pct = total > 0 ? ((cnt/total)*100).toFixed(0) : 0;
+    const chip = document.createElement('div');
+    chip.style.cssText = `display:flex;align-items:center;gap:5px;background:${chColor[ch]}15;border:1px solid ${chColor[ch]}30;border-radius:20px;padding:4px 10px`;
+    chip.innerHTML = `<span style="font-size:11px">${chIcon[ch]}</span><span style="font-size:11px;font-weight:700;color:${chColor[ch]}">${cnt} (${pct}%)</span><span style="font-size:10px;color:var(--text-3)">${chLabel[ch]}</span>`;
+    summary.appendChild(chip);
+  });
+  wrap.appendChild(summary);
+
+  parentEl.appendChild(wrap);
+}
+
+const heatmapWrap = document.getElementById('heatmapWrap');
+renderHeatmap(heatmapWrap, 'Campaign A — Call First · Connections per Attempt', C.aColor, seqA, connA);
+renderHeatmap(heatmapWrap, 'Campaign B — Text First · Connections per Attempt', C.bColor, seqB, connB);
+</script>
+</body>
+</html>
