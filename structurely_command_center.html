@@ -193,6 +193,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);font-
 .pl-item{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:500;color:rgba(255,255,255,.6)}
 .pl-dot{width:7px;height:7px;border-radius:50%}
 
+/* ── CHANNEL TABS ─────────────────────────────────────────── */
+.ch-tab{font-size:13px;font-weight:600;color:var(--t3);border:none;background:transparent;padding:14px 18px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .15s}
+.ch-tab:hover{color:var(--t2)}
+.ch-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.ch-badge{font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;background:var(--accent-10);color:var(--accent)}
+.ch-badge.ch-p2{background:#f1eeff;color:var(--purple)}
+
 /* ── TOOLTIP ──────────────────────────────────────────────── */
 [data-tip]{position:relative;cursor:help}
 [data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(30,37,56,.95);color:#fff;font-size:10px;font-weight:500;padding:5px 10px;border-radius:6px;white-space:nowrap;z-index:1000;pointer-events:none}
@@ -231,14 +238,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);font-
   <div class="hs-refresh"><div class="rdot"></div>Refreshed 2 min ago · 15-min cadence</div>
 </div>
 
+<!-- CHANNEL DRILL-DOWN TABS -->
+<div style="background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:0;overflow-x:auto">
+  <button class="ch-tab active" onclick="setChTab(this)">Lead Funnel <span class="ch-badge">P1</span></button>
+  <button class="ch-tab" onclick="setChTab(this)">Call Performance <span class="ch-badge">P1</span></button>
+  <button class="ch-tab" onclick="setChTab(this)">Account Scorecard <span class="ch-badge">P1</span></button>
+  <button class="ch-tab" onclick="setChTab(this)">Transfer Rate Analysis <span class="ch-badge ch-p2">P2</span></button>
+  <button class="ch-tab" onclick="setChTab(this)">SMS & Text Performance <span class="ch-badge ch-p2">P2</span></button>
+  <button class="ch-tab" onclick="setChTab(this)">Disposition Drilldown <span class="ch-badge ch-p2">P2</span></button>
+</div>
+
 <!-- FILTER BAR -->
 <div class="fbar">
-  <span class="fl">View</span>
+  <span class="fl">Period</span>
   <div class="seg" id="periodSeg">
-    <button class="seg-btn active" onclick="setSeg(this,'period')">Rolling 7-Day</button>
-    <button class="seg-btn" onclick="setSeg(this,'period')">This Month</button>
+    <button class="seg-btn" onclick="setSeg(this,'period')">Rolling 7-Day</button>
+    <button class="seg-btn active" onclick="setSeg(this,'period')">This Month</button>
     <button class="seg-btn" onclick="setSeg(this,'period')">Last Month</button>
+    <button class="seg-btn" onclick="openDatePicker(this)" id="datePickerBtn">📅 Custom</button>
   </div>
+  <input type="date" id="dpStart" style="display:none;font-size:12px;font-weight:600;color:var(--t1);border:1.5px solid var(--accent);border-radius:var(--r);padding:4px 8px;font-family:inherit;background:var(--s2)" onchange="updateDateLabel()">
+  <span id="dpSep" style="display:none;font-size:12px;color:var(--t3)">→</span>
+  <input type="date" id="dpEnd" style="display:none;font-size:12px;font-weight:600;color:var(--t1);border:1.5px solid var(--accent);border-radius:var(--r);padding:4px 8px;font-family:inherit;background:var(--s2)" onchange="updateDateLabel()">
   <div class="fsep"></div>
   <span class="fl">Account Level</span>
   <div class="seg" id="hierSeg">
@@ -258,8 +279,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);font-
   <!-- KPI CARDS -->
   <div class="sh" style="margin-bottom:10px">
     <div>
-      <div class="sh-title">Platform KPIs — Rolling 7-Day</div>
-      <div class="sh-sub">Core success metrics · All accounts · Color threshold: green ≥+5% · yellow ±5% · red ≤−5%</div>
+      <div class="sh-title" id="kpiTitle">Platform KPIs — March 2026 Cohort</div>
+      <div class="sh-sub">Core success metrics · All accounts · Cohort view: all leads enrolled in March 2026 · Current pipeline status of that cohort</div>
     </div>
     <button class="btn">⬇ Export PDF</button>
   </div>
@@ -270,15 +291,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);font-
     <div class="kpi k1">
       <div class="kpi-label">
         <span>Leads Enrolled</span>
-        <span data-tip="Rolling 7-day total vs prior 7 days" style="cursor:help;color:var(--t3);font-size:11px">ⓘ</span>
+        <span data-tip="Total leads enrolled in the March 2026 cohort · All accounts · Cohort view" style="cursor:help;color:var(--t3);font-size:11px">ⓘ</span>
       </div>
-      <div class="kpi-main">3,284</div>
-      <div class="kpi-sub">This week · All accounts</div>
+      <div class="kpi-main">44,780</div>
+      <div class="kpi-sub">March 2026 cohort · All accounts</div>
       <div>
-        <span class="trend t-green"><span class="trend-arrow">↑</span>+8.4%</span>
-        <span style="font-size:10px;color:var(--t3)">vs prior 7 days (3,029)</span>
+        <span class="trend t-green"><span class="trend-arrow">↑</span>+12.4%</span>
+        <span style="font-size:10px;color:var(--t3)">vs Feb 2026 cohort (39,840)</span>
       </div>
-      <div class="kpi-count">Prior week: 3,029 leads</div>
+      <div class="kpi-count">Prior month cohort: 39,840 leads enrolled</div>
       <div class="sparkline-wrap">
         <div class="spark" id="sp-enrolled"></div>
       </div>
@@ -288,15 +309,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);font-
     <div class="kpi k2">
       <div class="kpi-label">
         <span>AI Agent Activity</span>
-        <span data-tip="Total outbound calls + texts + emails this week" style="cursor:help;color:var(--t3);font-size:11px">ⓘ</span>
+        <span data-tip="Total outbound calls + texts + emails for March cohort" style="cursor:help;color:var(--t3);font-size:11px">ⓘ</span>
       </div>
-      <div class="kpi-main">47,820</div>
-      <div class="kpi-sub">Total outbound · Call + Text + Email</div>
+      <div class="kpi-main">487,200</div>
+      <div class="kpi-sub">Total outbound · Call + Text + Email · March cohort</div>
       <div>
-        <span class="trend t-green"><span class="trend-arrow">↑</span>+6.1%</span>
-        <span style="font-size:10px;color:var(--t3)">vs prior 7 days (45,067)</span>
+        <span class="trend t-green"><span class="trend-arrow">↑</span>+9.8%</span>
+        <span style="font-size:10px;color:var(--t3)">vs Feb 2026 cohort (443,600)</span>
       </div>
-      <div class="kpi-count">Calls: 9,840 · Texts: 28,160 · Emails: 9,820</div>
+      <div class="kpi-count">Calls: 98,400 · Texts: 281,600 · Emails: 107,200</div>
       <div class="sparkline-wrap">
         <div class="spark" id="sp-activity"></div>
       </div>
@@ -311,11 +332,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);font-
       <div class="kpi-main pct">21.4%</div>
       <div class="kpi-sub">Connected leads ÷ unique leads enrolled</div>
       <div>
-        <span class="trend t-yellow"><span class="trend-arrow">→</span>+1.2pp</span>
-        <span style="font-size:10px;color:var(--t3)">vs prior 7 days (20.2%)</span>
+        <span class="trend t-yellow"><span class="trend-arrow">→</span>+0.8pp</span>
+        <span style="font-size:10px;color:var(--t3)">vs Feb 2026 cohort (20.6%)</span>
       </div>
-      <div class="kpi-count">703 connected of 3,284 enrolled</div>
-      <div class="kpi-formula">[(Text replies 412 − Opt-outs 31) + Human calls 198 + Email replies 124] ÷ 3,284</div>
+      <div class="kpi-count">9,583 connected of 44,780 enrolled</div>
+      <div class="kpi-formula">[(Text replies 5,210 − Opt-outs 401) + Human calls 2,480 + Email replies 2,294] ÷ 44,780</div>
       <div class="sparkline-wrap">
         <div class="spark" id="sp-connected"></div>
       </div>
@@ -325,15 +346,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);font-
     <div class="kpi k4">
       <div class="kpi-label">
         <span>Attempted Transfer Rate</span>
-        <span data-tip="Unique leads with ≥1 transfer attempt ÷ unique leads enrolled · Rolling 7-day cohort · Threshold: green >+0.1pp · yellow ±0.1pp · red <−0.1pp" style="cursor:help;color:var(--t3);font-size:11px">ⓘ</span>
+        <span data-tip="Unique leads with ≥1 transfer attempt ÷ unique leads enrolled · March cohort · Threshold: green >+0.1pp · yellow ±0.1pp · red <−0.1pp" style="cursor:help;color:var(--t3);font-size:11px">ⓘ</span>
       </div>
       <div class="kpi-main pct">9.8%</div>
       <div class="kpi-sub">Unique enrolled leads with transfer attempt</div>
       <div>
         <span class="trend t-green"><span class="trend-arrow">↑</span>+0.3pp</span>
-        <span style="font-size:10px;color:var(--t3)">vs prior 7 days (9.5%)</span>
+        <span style="font-size:10px;color:var(--t3)">vs Feb 2026 cohort (9.5%)</span>
       </div>
-      <div class="kpi-count">322 transfer attempts · 3,284 enrolled</div>
+      <div class="kpi-count">4,388 transfer attempts · 44,780 enrolled</div>
       <div class="kpi-formula">De-duped by lead · Call + Text transfers combined</div>
       <div class="sparkline-wrap">
         <div class="spark" id="sp-transfer"></div>
@@ -344,13 +365,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);font-
     <div class="kpi k5">
       <div class="kpi-label">
         <span>Active Lead Pipeline</span>
-        <span data-tip="Leads in ACTIVE_IN_SEQUENCE or ACTIVE_AI_QUEUE status across all cohorts" style="cursor:help;color:var(--t3);font-size:11px">ⓘ</span>
+        <span data-tip="Leads in ACTIVE_IN_SEQUENCE or ACTIVE_AI_QUEUE status · March cohort · Current state today" style="cursor:help;color:var(--t3);font-size:11px">ⓘ</span>
       </div>
       <div class="kpi-main">18,440</div>
-      <div class="kpi-sub">Total active leads · All cohorts · All accounts</div>
+      <div class="kpi-sub">Active leads remaining · March cohort · As of today</div>
       <div>
-        <span class="trend t-yellow"><span class="trend-arrow">→</span>+2.1%</span>
-        <span style="font-size:10px;color:var(--t3)">vs prior week (18,062)</span>
+        <span class="trend t-yellow"><span class="trend-arrow">→</span>41.2% of cohort still active</span>
       </div>
       <div class="kpi-count">In sequence: 14,210 · AI queue: 4,230</div>
       <div class="sparkline-wrap">
@@ -364,30 +384,30 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);font-
   <div class="pipeline-strip">
     <div class="ps-item">
       <div class="ps-val">18,440</div>
-      <div class="ps-lbl">Active Total</div>
+      <div class="ps-lbl">Active Leads</div>
     </div>
     <div class="ps-div"></div>
     <div style="flex:1">
-      <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">All-cohort pipeline status snapshot · Today</div>
+      <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">March 2026 cohort pipeline status · Current state of all 44,780 enrolled leads</div>
       <div class="ps-bar-wrap">
-        <div class="ps-bar-seg psb-seq" style="width:32%">In Sequence 14,210</div>
-        <div class="ps-bar-seg psb-ai" style="width:9%">AI Queue 4,230</div>
-        <div class="ps-bar-seg psb-xfer" style="width:18%">Transferred 8,120</div>
-        <div class="ps-bar-seg psb-opt" style="width:22%">Opted Out 9,880</div>
-        <div class="ps-bar-seg psb-exh" style="width:19%">Exhausted 8,340</div>
+        <div class="ps-bar-seg psb-seq" style="width:31.7%">In Sequence 14,210</div>
+        <div class="ps-bar-seg psb-ai" style="width:9.4%">AI Queue 4,230</div>
+        <div class="ps-bar-seg psb-xfer" style="width:18.1%">Transferred 8,120</div>
+        <div class="ps-bar-seg psb-opt" style="width:22.1%">Opted Out 9,880</div>
+        <div class="ps-bar-seg psb-exh" style="width:18.6%">Exhausted 8,340</div>
       </div>
       <div class="ps-legend" style="margin-top:6px">
-        <div class="pl-item"><div class="pl-dot" style="background:var(--accent)"></div>Active In Sequence</div>
-        <div class="pl-item"><div class="pl-dot" style="background:var(--purple)"></div>Active AI Queue</div>
-        <div class="pl-item"><div class="pl-dot" style="background:var(--green)"></div>Transferred</div>
-        <div class="pl-item"><div class="pl-dot" style="background:var(--red)"></div>Opted Out</div>
-        <div class="pl-item"><div class="pl-dot" style="background:rgba(255,255,255,.3)"></div>Sequence Exhausted</div>
+        <div class="pl-item"><div class="pl-dot" style="background:var(--accent)"></div>Active In Sequence 14,210 (31.7%)</div>
+        <div class="pl-item"><div class="pl-dot" style="background:var(--purple)"></div>Active AI Queue 4,230 (9.4%)</div>
+        <div class="pl-item"><div class="pl-dot" style="background:var(--green)"></div>Transferred 8,120 (18.1%)</div>
+        <div class="pl-item"><div class="pl-dot" style="background:var(--red)"></div>Opted Out 9,880 (22.1%)</div>
+        <div class="pl-item"><div class="pl-dot" style="background:rgba(255,255,255,.3)"></div>Seq. Exhausted 8,340 (18.6%)</div>
       </div>
     </div>
     <div class="ps-div"></div>
     <div class="ps-item" style="text-align:right">
       <div class="ps-val">44,780</div>
-      <div class="ps-lbl">Total in cohorts</div>
+      <div class="ps-lbl">Total Enrolled</div>
     </div>
   </div>
 
@@ -910,9 +930,145 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);font-
     </div>
   </div>
 
+  <!-- BOTTOM 5: LOWEST TRANSFER RATE — CHURN RISK -->
+  <div class="panel-grid" style="grid-template-columns:1fr">
+    <div class="acard">
+      <div class="ac-header">
+        <div>
+          <div class="ac-title">🔻 At-Risk — Bottom 5 Transfer Rate</div>
+          <div class="ac-sub">Lowest Attempted Transfer Rate (unique leads with transfer attempt ÷ enrolled) · Rolling 7 days · Platform average 9.8% · Low transfer rate = AI not converting engaged leads → churn signal</div>
+        </div>
+        <span class="ac-badge ab-risk">Churn Risk</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+        <div>
+          <div class="cr">
+            <div class="cr-rank">1</div>
+            <div class="cr-icon ci-red">🏦</div>
+            <div class="cr-info">
+              <div class="cr-name">Clearwater Mortgage Co.</div>
+              <div class="cr-meta"><span class="cr-tag ct-grw">Growth</span><span class="cr-tag ct-ind">Individual</span>Mortgage Lending</div>
+            </div>
+            <div class="cr-metrics">
+              <div class="crm"><div class="crm-val" style="color:var(--red)">2.1%</div><div class="crm-lbl">Xfer rate</div></div>
+              <div class="crm"><div class="crm-val">410</div><div class="crm-lbl">Enrolled</div></div>
+              <div class="crm"><div class="crm-val">9</div><div class="crm-lbl">Attempted</div></div>
+            </div>
+            <div class="cr-trend" style="color:var(--red)">↓−3.2pp</div>
+            <div class="cr-action"><button class="action-pill ap-risk">Action</button></div>
+          </div>
+          <div class="cr">
+            <div class="cr-rank">2</div>
+            <div class="cr-icon ci-red">🏡</div>
+            <div class="cr-info">
+              <div class="cr-name">Harbor Bay Realty</div>
+              <div class="cr-meta"><span class="cr-tag ct-grw">Growth</span><span class="cr-tag ct-tm">Team</span>Real Estate Sales</div>
+            </div>
+            <div class="cr-metrics">
+              <div class="crm"><div class="crm-val" style="color:var(--red)">3.4%</div><div class="crm-lbl">Xfer rate</div></div>
+              <div class="crm"><div class="crm-val">320</div><div class="crm-lbl">Enrolled</div></div>
+              <div class="crm"><div class="crm-val">11</div><div class="crm-lbl">Attempted</div></div>
+            </div>
+            <div class="cr-trend" style="color:var(--red)">↓−2.8pp</div>
+            <div class="cr-action"><button class="action-pill ap-risk">Action</button></div>
+          </div>
+          <div class="cr">
+            <div class="cr-rank">3</div>
+            <div class="cr-icon ci-yellow">🏗</div>
+            <div class="cr-info">
+              <div class="cr-name">ProBuild Services</div>
+              <div class="cr-meta"><span class="cr-tag ct-grw">Growth</span><span class="cr-tag ct-tm">Team</span>Home Improvement</div>
+            </div>
+            <div class="cr-metrics">
+              <div class="crm"><div class="crm-val" style="color:var(--yellow)">4.2%</div><div class="crm-lbl">Xfer rate</div></div>
+              <div class="crm"><div class="crm-val">290</div><div class="crm-lbl">Enrolled</div></div>
+              <div class="crm"><div class="crm-val">12</div><div class="crm-lbl">Attempted</div></div>
+            </div>
+            <div class="cr-trend" style="color:var(--red)">↓−1.9pp</div>
+            <div class="cr-action"><button class="action-pill ap-risk">Action</button></div>
+          </div>
+        </div>
+        <div>
+          <div class="cr">
+            <div class="cr-rank">4</div>
+            <div class="cr-icon ci-yellow">🏦</div>
+            <div class="cr-info">
+              <div class="cr-name">Sunrise Lending</div>
+              <div class="cr-meta"><span class="cr-tag ct-grw">Growth</span><span class="cr-tag ct-ind">Individual</span>Mortgage Lending</div>
+            </div>
+            <div class="cr-metrics">
+              <div class="crm"><div class="crm-val" style="color:var(--yellow)">4.8%</div><div class="crm-lbl">Xfer rate</div></div>
+              <div class="crm"><div class="crm-val">280</div><div class="crm-lbl">Enrolled</div></div>
+              <div class="crm"><div class="crm-val">13</div><div class="crm-lbl">Attempted</div></div>
+            </div>
+            <div class="cr-trend" style="color:var(--red)">↓−1.4pp</div>
+            <div class="cr-action"><button class="action-pill ap-risk">Action</button></div>
+          </div>
+          <div class="cr">
+            <div class="cr-rank">5</div>
+            <div class="cr-icon ci-yellow">🏦</div>
+            <div class="cr-info">
+              <div class="cr-name">Keystone Capital Group</div>
+              <div class="cr-meta"><span class="cr-tag ct-ent">Enterprise</span><span class="cr-tag ct-co">Company</span>Mortgage Lending</div>
+            </div>
+            <div class="cr-metrics">
+              <div class="crm"><div class="crm-val" style="color:var(--yellow)">5.9%</div><div class="crm-lbl">Xfer rate</div></div>
+              <div class="crm"><div class="crm-val">612</div><div class="crm-lbl">Enrolled</div></div>
+              <div class="crm"><div class="crm-val">36</div><div class="crm-lbl">Attempted</div></div>
+            </div>
+            <div class="cr-trend" style="color:var(--red)">↓−1.1pp</div>
+            <div class="cr-action"><button class="action-pill ap-watch">Watch</button></div>
+          </div>
+          <!-- Insight callout -->
+          <div style="margin:10px 16px;padding:12px 14px;background:var(--red-bg);border-radius:8px;border:1px solid rgba(217,64,64,.2)">
+            <div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:4px">⚠ Why Transfer Rate matters for churn</div>
+            <div style="font-size:11px;color:var(--t2);line-height:1.5">A low transfer rate means the AI is reaching leads but not converting them to handoffs — the client's primary value metric. Clients who don't see transfers stop seeing ROI. Platform average: <strong>9.8%</strong>. All 5 accounts above are significantly below threshold.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /main -->
 
 <script>
+// ── CHANNEL TAB ────────────────────────────────────────────
+function setChTab(el) {
+  document.querySelectorAll('.ch-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── DATE PICKER ────────────────────────────────────────────
+function openDatePicker(btn) {
+  const start = document.getElementById('dpStart');
+  const end = document.getElementById('dpEnd');
+  const sep = document.getElementById('dpSep');
+  const isVisible = start.style.display !== 'none';
+  if (isVisible) {
+    start.style.display = 'none';
+    end.style.display = 'none';
+    sep.style.display = 'none';
+  } else {
+    start.style.display = 'inline-block';
+    end.style.display = 'inline-block';
+    sep.style.display = 'inline';
+    // set default range to current month
+    start.value = '2026-03-01';
+    end.value = '2026-03-31';
+    document.querySelectorAll('#periodSeg .seg-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+}
+
+function updateDateLabel() {
+  const s = document.getElementById('dpStart').value;
+  const e = document.getElementById('dpEnd').value;
+  if (s && e) {
+    const fmt = d => new Date(d + 'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    document.getElementById('kpiTitle').textContent = `Platform KPIs — ${fmt(s)} to ${fmt(e)}`;
+  }
+}
+
 // ── SEGMENT TOGGLE ─────────────────────────────────────────
 function setSeg(el, group) {
   el.closest('.seg').querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
