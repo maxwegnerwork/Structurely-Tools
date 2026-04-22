@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Performance Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2335;
+    --border: #2a2f45;
+    --text: #e8eaf0;
+    --muted: #6b7294;
+    --accent: #4f8ef7;
+    --green: #34d399;
+    --orange: #f59e0b;
+    --red: #f87171;
+    --teal: #2dd4bf;
+    --purple: #a78bfa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 28px; height: 28px; display: flex; flex-direction: column; gap: 4px; }
+  .logo-icon span { display: block; height: 4px; background: var(--accent); border-radius: 2px; }
+  .logo-icon span:nth-child(2) { width: 60%; }
+  .logo-icon span:nth-child(3) { width: 40%; }
+  .logo h1 { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
+
+  .header-meta { display: flex; align-items: center; gap: 16px; }
+  .refresh-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+  .date-badge {
+    font-size: 11px;
+    color: var(--green);
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.2);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 57px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 8px 4px;
+    margin-top: 8px;
+  }
+
+  .filter-group { display: flex; flex-direction: column; gap: 3px; }
+
+  .filter-item {
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7294'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 24px;
+  }
+
+  .filter-label { font-size: 10px; color: var(--muted); margin-bottom: 2px; padding-left: 2px; }
+
+  /* MAIN */
+  .main { padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+
+  /* KPI ROW */
+  .kpi-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .kpi-card.green::before { background: var(--green); }
+  .kpi-card.orange::before { background: var(--orange); }
+  .kpi-card.red::before { background: var(--red); }
+  .kpi-card.teal::before { background: var(--teal); }
+  .kpi-card.purple::before { background: var(--purple); }
+
+  .kpi-label { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .kpi-value { font-size: 20px; font-weight: 700; letter-spacing: -1px; color: var(--accent); font-family: 'DM Mono', monospace; }
+  .kpi-card.green .kpi-value { color: var(--green); }
+  .kpi-card.orange .kpi-value { color: var(--orange); }
+  .kpi-card.red .kpi-value { color: var(--red); }
+  .kpi-card.teal .kpi-value { color: var(--teal); }
+  .kpi-card.purple .kpi-value { color: var(--purple); }
+
+  .kpi-delta {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .kpi-delta.up { color: var(--green); }
+  .kpi-delta.down { color: var(--red); }
+
+  /* GRID ROWS */
+  .chart-row { display: grid; gap: 12px; }
+  .row-2 { grid-template-columns: 1fr 1fr; }
+  .row-3 { grid-template-columns: 2fr 1fr 1fr; }
+  .row-half { grid-template-columns: 1fr 1fr; }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    position: relative;
+  }
+
+  .chart-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+  }
+
+  .chart-subtitle {
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  /* ===== ATTEMPT FUNNEL ===== */
+  .funnel-container { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+
+  .funnel-row { display: flex; align-items: center; gap: 10px; }
+  .funnel-attempt { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); width: 52px; flex-shrink: 0; }
+  .funnel-bar-wrap { flex: 1; background: var(--surface2); border-radius: 3px; height: 22px; position: relative; overflow: hidden; }
+  .funnel-bar {
+    height: 100%;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'DM Mono', monospace;
+    color: var(--bg);
+    transition: width 0.6s ease;
+  }
+  .funnel-meta { width: 80px; text-align: right; font-family: 'DM Mono', monospace; font-size: 10px; }
+  .funnel-transfer { color: var(--green); }
+  .funnel-drop { color: var(--red); }
+
+  .funnel-legend { display: flex; gap: 14px; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  /* ===== HEATMAP ===== */
+  .heatmap-grid { display: grid; grid-template-columns: 40px repeat(12, 1fr); gap: 2px; }
+  .heatmap-header { font-size: 9px; color: var(--muted); text-align: center; padding: 2px 0; font-family: 'DM Mono', monospace; }
+  .heatmap-row-label { font-size: 9px; color: var(--muted); display: flex; align-items: center; font-family: 'DM Mono', monospace; }
+  .heatmap-cell {
+    height: 20px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    position: relative;
+  }
+  .heatmap-cell:hover { opacity: 0.8; outline: 1px solid white; }
+
+  /* ===== CAMPAIGN TABLE ===== */
+  .campaign-table { width: 100%; border-collapse: collapse; }
+  .campaign-table th {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .campaign-table th.right { text-align: right; }
+  .campaign-table td {
+    padding: 7px 8px;
+    border-bottom: 1px solid rgba(42,47,69,0.5);
+    font-size: 11px;
+    vertical-align: middle;
+  }
+  .campaign-table tr:last-child td { border-bottom: none; }
+  .campaign-table tr:hover td { background: var(--surface2); }
+
+  .campaign-name { font-weight: 500; }
+  .campaign-tag {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .tag-active { background: rgba(79,142,247,0.15); color: var(--accent); }
+  .tag-paused { background: rgba(107,114,148,0.15); color: var(--muted); }
+
+  .spark-bar-wrap { display: flex; align-items: center; gap: 6px; }
+  .spark-bar { height: 6px; border-radius: 2px; min-width: 4px; }
+  .mono { font-family: 'DM Mono', monospace; font-size: 11px; }
+  .right { text-align: right; }
+
+  .rate-pill {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .rate-high { background: rgba(52,211,153,0.12); color: var(--green); }
+  .rate-med { background: rgba(245,158,11,0.12); color: var(--orange); }
+  .rate-low { background: rgba(248,113,113,0.12); color: var(--red); }
+
+  /* ===== DISPOSITION CHART ===== */
+  .disp-list { display: flex; flex-direction: column; gap: 7px; }
+  .disp-row { display: flex; align-items: center; gap: 8px; }
+  .disp-label { font-size: 10px; color: var(--muted); width: 100px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .disp-bar-wrap { flex: 1; background: var(--surface2); border-radius: 3px; height: 16px; overflow: hidden; }
+  .disp-bar { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 6px; font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.8); }
+  .disp-count { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); width: 36px; text-align: right; }
+
+  /* ===== DONUT ===== */
+  .donut-wrap { display: flex; align-items: center; gap: 16px; }
+  .donut-svg { flex-shrink: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 8px; }
+  .donut-legend-item { display: flex; align-items: center; gap: 8px; }
+  .donut-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .donut-legend-label { font-size: 11px; color: var(--muted); }
+  .donut-legend-val { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 600; margin-left: auto; padding-left: 12px; }
+
+  /* ===== LINE CHART ===== */
+  .line-chart-wrap { position: relative; }
+  .line-chart-wrap svg { width: 100%; }
+  .axis-label { font-size: 9px; fill: #6b7294; font-family: 'DM Mono', monospace; }
+  .grid-line { stroke: #2a2f45; stroke-width: 1; }
+  .chart-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .chart-dot { r: 3; }
+
+  /* ===== ATTEMPT OUTCOME STACKED ===== */
+  .stacked-row { display: flex; height: 28px; border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+  .stacked-seg { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.85); min-width: 20px; }
+  .stacked-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; font-family: 'DM Mono', monospace; }
+
+  .section-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+  .tab { padding: 6px 14px; font-size: 11px; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .insight-banner {
+    background: rgba(79,142,247,0.07);
+    border: 1px solid rgba(79,142,247,0.2);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .insight-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .insight-title { font-weight: 600; color: var(--accent); margin-bottom: 2px; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <span style="width:100%"></span>
+      <span></span>
+      <span></span>
+    </div>
+    <h1>Lead Performance Dashboard</h1>
+  </div>
+  <div class="header-meta">
+    <span class="refresh-badge">Refreshed: Apr 21, 2026 · 06:00 AM</span>
+    <span class="date-badge">● LIVE</span>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-label">Filters</div>
+
+    <div class="filter-group">
+      <div class="filter-label">Date Range</div>
+      <select class="filter-item"><option>Last 30 Days</option><option>Last 12 Months</option><option>This Quarter</option><option>This Week</option></select>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-label">Brokerage</div>
+      <select class="filter-item"><option>(All)</option><option>Alpha Realty Group</option><option>Summit Partners</option><option>Coastal Holdings</option></select>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-label">Agent</div>
+      <select class="filter-item"><option>(All)</option><option>Sarah Chen</option><option>Marcus Webb</option><option>Jordan Ellis</option></select>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-label">User</div>
+      <select class="filter-item"><option>(All)</option></select>
+    </div>
+
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- KPI ROW -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">Leads Received</div>
+        <div class="kpi-value">2,996</div>
+        <div class="kpi-delta up">▲ 8.2% vs prior period</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Leads Enrolled</div>
+        <div class="kpi-value">1,967</div>
+        <div class="kpi-delta up">▲ 65.65% enroll rate</div>
+      </div>
+      <div class="kpi-card" style="--card-color: #818cf8;">
+        <div class="kpi-label">AI Activity Count</div>
+        <div class="kpi-value" style="color:#818cf8;">8,412</div>
+        <div class="kpi-delta up" style="color:#818cf8;">▲ 4.3 avg per lead</div>
+      </div>
+      <div class="kpi-card teal">
+        <div class="kpi-label">Contacted</div>
+        <div class="kpi-value">1,836</div>
+        <div class="kpi-delta up">▲ 61.3% contact rate</div>
+      </div>
+      <div class="kpi-card orange">
+        <div class="kpi-label">Transfer Rate</div>
+        <div class="kpi-value">10.65%</div>
+        <div class="kpi-delta down">▼ 4.35pp below target</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">Transfers</div>
+        <div class="kpi-value">319</div>
+        <div class="kpi-delta up">▲ transfers this period</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">Avg Attempts / Transfer</div>
+        <div class="kpi-value">3.2</div>
+        <div class="kpi-delta down">▼ benchmark is 2.8</div>
+      </div>
+      <div class="kpi-card" style="">
+        <div class="kpi-label">Active Leads</div>
+        <div class="kpi-value" style="color:#e8eaf0;">1,204</div>
+        <div class="kpi-delta up" style="color:var(--green);">▲ currently in sequence</div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Attempt Funnel + Heatmap -->
+    <div class="chart-row row-2">
+
+      <!-- ATTEMPT FUNNEL -->
+      <div class="chart-card">
+        <div class="chart-title">Transfer Rate by Attempt Number</div>
+        <div class="chart-subtitle">Where in the contact sequence do transfers happen — and where leads drop</div>
+        <div class="funnel-container">
+
+          <div style="display: grid; grid-template-columns: 52px 1fr 80px; font-size: 9px; color: var(--muted); padding: 0 0 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+            <span>Attempt</span><span>Outcome breakdown</span><span style="text-align:right;">Xfer Rate</span>
+          </div>
+
+          <!-- Attempt 1 -->
+          <div class="funnel-row">
+            <div class="funnel-attempt">Attempt 1</div>
+            <div class="funnel-bar-wrap">
+              <div style="display:flex; height:100%; border-radius:3px; overflow:hidden;">
+                <div style="width:18.4%; background:#34d399;" title="Transferred 18.4%"></div>
+                <div style="width:22%; background:#4f8ef7;" title="Voicemail 22%"></div>
+                <div style="width:41%; background:#f59e0b;" title="No Answer 41%"></div>
+                <div style="width:18.6%; background:#f87171;" title="Other 18.6%"></div>
+              </div>
+            </div>
+            <div class="funnel-meta funnel-transfer mono">18.4%</div>
+          </div>
+
+          <!-- Attempt 2 -->
+          <div class="funnel-row">
+            <div class="funnel-attempt">Attempt 2</div>
+            <div class="funnel-bar-wrap">
+              <div style="display:flex; height:100%; border-radius:3px; overflow:hidden;">
+                <div style="width:14.1%; background:#34d399;"></div>
+                <div style="width:28%; background:#4f8ef7;"></div>
+                <div style="width:38%; background:#f59e0b;"></div>
+                <div style="width:19.9%; background:#f87171;"></div>
+              </div>
+            </div>
+            <div class="funnel-meta funnel-transfer mono">14.1%</div>
+          </div>
+
+          <!-- Attempt 3 -->
+          <div class="funnel-row">
+            <div class="funnel-attempt">Attempt 3</div>
+            <div class="funnel-bar-wrap">
+              <div style="display:flex; height:100%; border-radius:3px; overflow:hidden;">
+                <div style="width:9.3%; background:#34d399;"></div>
+                <div style="width:30%; background:#4f8ef7;"></div>
+                <div style="width:42%; background:#f59e0b;"></div>
+                <div style="width:18.7%; background:#f87171;"></div>
+              </div>
+            </div>
+            <div class="funnel-meta funnel-transfer mono">9.3%</div>
+          </div>
+
+          <!-- Attempt 4 -->
+          <div class="funnel-row">
+            <div class="funnel-attempt">Attempt 4</div>
+            <div class="funnel-bar-wrap">
+              <div style="display:flex; height:100%; border-radius:3px; overflow:hidden;">
+                <div style="width:5.2%; background:#34d399;"></div>
+                <div style="width:25%; background:#4f8ef7;"></div>
+                <div style="width:49%; background:#f59e0b;"></div>
+                <div style="width:20.8%; background:#f87171;"></div>
+              </div>
+            </div>
+            <div class="funnel-meta funnel-drop mono">5.2%</div>
+          </div>
+
+          <!-- Attempt 5+ -->
+          <div class="funnel-row">
+            <div class="funnel-attempt">Attempt 5+</div>
+            <div class="funnel-bar-wrap">
+              <div style="display:flex; height:100%; border-radius:3px; overflow:hidden;">
+                <div style="width:3.1%; background:#34d399;"></div>
+                <div style="width:20%; background:#4f8ef7;"></div>
+                <div style="width:55%; background:#f59e0b;"></div>
+                <div style="width:21.9%; background:#f87171;"></div>
+              </div>
+            </div>
+            <div class="funnel-meta funnel-drop mono">3.1%</div>
+          </div>
+
+        </div>
+        <div class="funnel-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div>Transferred</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#4f8ef7"></div>Voicemail</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>No Answer</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>Other / Failed</div>
+        </div>
+      </div>
+
+      <!-- BEST TIME TO CALL HEATMAP -->
+      <div class="chart-card">
+        <div class="chart-title">Best Time to Call Heatmap</div>
+        <div class="chart-subtitle">Transfer rate by day of week × hour of day</div>
+
+        <div class="heatmap-grid">
+          <!-- Headers: hours -->
+          <div class="heatmap-header"></div>
+          <div class="heatmap-header">8a</div>
+          <div class="heatmap-header">9a</div>
+          <div class="heatmap-header">10a</div>
+          <div class="heatmap-header">11a</div>
+          <div class="heatmap-header">12p</div>
+          <div class="heatmap-header">1p</div>
+          <div class="heatmap-header">2p</div>
+          <div class="heatmap-header">3p</div>
+          <div class="heatmap-header">4p</div>
+          <div class="heatmap-header">5p</div>
+          <div class="heatmap-header">6p</div>
+          <div class="heatmap-header">7p</div>
+
+          <!-- MON -->
+          <div class="heatmap-row-label">Mon</div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.15)" title="8%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.45)" title="14%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.7)" title="18%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.9)" title="21%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.3)" title="11%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.5)" title="15%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.6)" title="17%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.4)" title="13%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.2)" title="9%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.3)" title="6%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.2)" title="5%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.1)" title="3%"></div>
+
+          <!-- TUE -->
+          <div class="heatmap-row-label">Tue</div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.2)" title="9%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.6)" title="17%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,1.0)" title="23%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.85)" title="20%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.35)" title="12%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.55)" title="16%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.65)" title="18%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.45)" title="14%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.25)" title="10%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.25)" title="6%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.15)" title="4%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.1)" title="3%"></div>
+
+          <!-- WED -->
+          <div class="heatmap-row-label">Wed</div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.2)" title="5%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.4)" title="13%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.65)" title="18%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.75)" title="19%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.2)" title="9%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.4)" title="13%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.5)" title="15%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.4)" title="14%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.15)" title="8%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.2)" title="5%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.15)" title="4%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.1)" title="3%"></div>
+
+          <!-- THU -->
+          <div class="heatmap-row-label">Thu</div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.15)" title="7%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.35)" title="12%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.55)" title="16%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.7)" title="18%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.3)" title="11%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.45)" title="14%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.55)" title="16%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.35)" title="12%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.2)" title="9%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.3)" title="6%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.2)" title="5%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.1)" title="3%"></div>
+
+          <!-- FRI -->
+          <div class="heatmap-row-label">Fri</div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.15)" title="5%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.3)" title="11%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.55)" title="15%"></div>
+          <div class="heatmap-cell" style="background:rgba(52,211,153,0.6)" title="17%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.25)" title="10%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.35)" title="12%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.45)" title="14%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.3)" title="11%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.25)" title="6%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.3)" title="6%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.2)" title="5%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.1)" title="2%"></div>
+
+          <!-- SAT -->
+          <div class="heatmap-row-label">Sat</div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.1)" title="3%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.2)" title="5%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.25)" title="9%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.3)" title="10%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.2)" title="5%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.15)" title="4%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.2)" title="8%"></div>
+          <div class="heatmap-cell" style="background:rgba(79,142,247,0.15)" title="7%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.15)" title="4%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.1)" title="3%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.1)" title="2%"></div>
+          <div class="heatmap-cell" style="background:rgba(248,113,113,0.05)" title="1%"></div>
+        </div>
+
+        <div style="display:flex; gap:14px; margin-top:10px; align-items:center;">
+          <span style="font-size:9px; color:var(--muted);">Low</span>
+          <div style="flex:1; height:6px; border-radius:3px; background: linear-gradient(to right, rgba(248,113,113,0.4), rgba(79,142,247,0.5), rgba(52,211,153,1.0));"></div>
+          <span style="font-size:9px; color:var(--muted);">High Transfer Rate</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 3: Agent Table + Failed Transfer Reasons + Transfer Trend -->
+    <div class="chart-row row-3">
+
+      <!-- AGENT TRANSFER RATE TABLE -->
+      <div class="chart-card">
+        <div class="chart-title">Transfer Rate by Agent</div>
+        <div class="chart-subtitle">Ranked by transfer rate — click any row to drill down</div>
+        <table class="campaign-table">
+          <thead>
+            <tr>
+              <th>Lead Source</th>
+              <th class="right">Active Leads</th>
+              <th class="right">Contacted</th>
+              <th class="right">Transfers</th>
+              <th class="right">Xfer Rate</th>
+              <th class="right">Avg Attempts</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="campaign-name">Spring Outreach 2026</td>
+              <td class="right mono">841</td>
+              <td class="right mono">612</td>
+              <td class="right mono">142</td>
+              <td class="right"><span class="rate-pill rate-high">16.9%</span></td>
+              <td class="right mono">2.4</td>
+            </tr>
+            <tr>
+              <td class="campaign-name">Inbound Follow-Up</td>
+              <td class="right mono">364</td>
+              <td class="right mono">298</td>
+              <td class="right mono">54</td>
+              <td class="right"><span class="rate-pill rate-high">14.8%</span></td>
+              <td class="right mono">2.7</td>
+            </tr>
+            <tr>
+              <td class="campaign-name">SalesForce Import</td>
+              <td class="right mono">387</td>
+              <td class="right mono">301</td>
+              <td class="right mono">49</td>
+              <td class="right"><span class="rate-pill rate-med">12.7%</span></td>
+              <td class="right mono">3.1</td>
+            </tr>
+            <tr>
+              <td class="campaign-name">Re-engage Q1 Leads</td>
+              <td class="right mono">512</td>
+              <td class="right mono">380</td>
+              <td class="right mono">48</td>
+              <td class="right"><span class="rate-pill rate-med">9.4%</span></td>
+              <td class="right mono">3.8</td>
+            </tr>
+            <tr>
+              <td class="campaign-name">Cold UI Leads</td>
+              <td class="right mono">628</td>
+              <td class="right mono">418</td>
+              <td class="right mono">42</td>
+              <td class="right"><span class="rate-pill rate-low">6.7%</span></td>
+              <td class="right mono">4.2</td>
+            </tr>
+            <tr>
+              <td class="campaign-name">Winter Aged Leads</td>
+              <td class="right mono">264</td>
+              <td class="right mono">194</td>
+              <td class="right mono">14</td>
+              <td class="right"><span class="rate-pill rate-low">5.3%</span></td>
+              <td class="right mono">4.9</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FAILED TRANSFER ATTEMPTS BY REASON -->
+      <div class="chart-card">
+        <div class="chart-title">Failed Transfer Attempts by Reason</div>
+        <div class="chart-subtitle">Why transfers did not complete this period</div>
+
+        <!-- Donut + legend -->
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+          <svg width="80" height="80" viewBox="0 0 80 80" style="flex-shrink:0;">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#1e2335" stroke-width="13"/>
+            <!-- Lead Not Interested: 38% = 71.6deg of 188.5 circ -->
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#f87171" stroke-width="13"
+              stroke-dasharray="71.6 188.5" stroke-dashoffset="47" stroke-linecap="butt"/>
+            <!-- No Agent Available: 27% = 50.9 -->
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#f59e0b" stroke-width="13"
+              stroke-dasharray="50.9 188.5" stroke-dashoffset="-24.6" stroke-linecap="butt"/>
+            <!-- Call Dropped: 18% = 33.9 -->
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#a78bfa" stroke-width="13"
+              stroke-dasharray="33.9 188.5" stroke-dashoffset="-75.5" stroke-linecap="butt"/>
+            <!-- Lead DNC: 10% = 18.85 -->
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#6b7294" stroke-width="13"
+              stroke-dasharray="18.85 188.5" stroke-dashoffset="-109.4" stroke-linecap="butt"/>
+            <!-- Tech / Setup Fail: 7% = 13.2 -->
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#2dd4bf" stroke-width="13"
+              stroke-dasharray="13.2 188.5" stroke-dashoffset="-128.25" stroke-linecap="butt"/>
+            <text x="40" y="36" text-anchor="middle" font-size="11" font-weight="700" fill="#e8eaf0" font-family="DM Mono,monospace">684</text>
+            <text x="40" y="47" text-anchor="middle" font-size="7" fill="#6b7294" font-family="DM Sans,sans-serif">failed</text>
+          </svg>
+          <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+            <div style="display:flex; align-items:center; gap:7px;">
+              <div style="width:9px; height:9px; border-radius:2px; background:#f87171; flex-shrink:0;"></div>
+              <span style="font-size:10px; flex:1; color:var(--muted);">Not Interested</span>
+              <span style="font-family:'DM Mono',monospace; font-size:11px; font-weight:600; color:#f87171;">38%</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <div style="width:9px; height:9px; border-radius:2px; background:#f59e0b; flex-shrink:0;"></div>
+              <span style="font-size:10px; flex:1; color:var(--muted);">No Agent Available</span>
+              <span style="font-family:'DM Mono',monospace; font-size:11px; font-weight:600; color:#f59e0b;">27%</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <div style="width:9px; height:9px; border-radius:2px; background:#a78bfa; flex-shrink:0;"></div>
+              <span style="font-size:10px; flex:1; color:var(--muted);">Call Dropped</span>
+              <span style="font-family:'DM Mono',monospace; font-size:11px; font-weight:600; color:#a78bfa;">18%</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <div style="width:9px; height:9px; border-radius:2px; background:#6b7294; flex-shrink:0;"></div>
+              <span style="font-size:10px; flex:1; color:var(--muted);">Lead DNC</span>
+              <span style="font-family:'DM Mono',monospace; font-size:11px; font-weight:600; color:#6b7294;">10%</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <div style="width:9px; height:9px; border-radius:2px; background:#2dd4bf; flex-shrink:0;"></div>
+              <span style="font-size:10px; flex:1; color:var(--muted);">Tech / Setup Fail</span>
+              <span style="font-family:'DM Mono',monospace; font-size:11px; font-weight:600; color:#2dd4bf;">7%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Horizontal bars for absolute counts -->
+        <div style="border-top:1px solid var(--border); padding-top:10px; display:flex; flex-direction:column; gap:5px;">
+          <div style="font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; font-weight:600; margin-bottom:3px;">Count by Reason</div>
+          <div class="disp-row">
+            <div class="disp-label">Not Interested</div>
+            <div class="disp-bar-wrap"><div class="disp-bar" style="width:100%; background:#f87171;">260</div></div>
+            <div class="disp-count">260</div>
+          </div>
+          <div class="disp-row">
+            <div class="disp-label">No Agent Available</div>
+            <div class="disp-bar-wrap"><div class="disp-bar" style="width:71%; background:#f59e0b;">185</div></div>
+            <div class="disp-count">185</div>
+          </div>
+          <div class="disp-row">
+            <div class="disp-label">Call Dropped</div>
+            <div class="disp-bar-wrap"><div class="disp-bar" style="width:47%; background:#a78bfa;">123</div></div>
+            <div class="disp-count">123</div>
+          </div>
+          <div class="disp-row">
+            <div class="disp-label">Lead DNC</div>
+            <div class="disp-bar-wrap"><div class="disp-bar" style="width:26%; background:#6b7294;">68</div></div>
+            <div class="disp-count">68</div>
+          </div>
+          <div class="disp-row">
+            <div class="disp-label">Tech / Setup Fail</div>
+            <div class="disp-bar-wrap"><div class="disp-bar" style="width:18%; background:#2dd4bf;">48</div></div>
+            <div class="disp-count">48</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRANSFER TREND -->
+      <div class="chart-card">
+        <div class="chart-title">Transfer Rate Trend</div>
+        <div class="chart-subtitle">Weekly transfer rate vs target</div>
+        <svg viewBox="0 0 200 120" style="width:100%; height:120px;">
+          <!-- Grid lines -->
+          <line x1="30" y1="15" x2="195" y2="15" class="grid-line"/>
+          <line x1="30" y1="45" x2="195" y2="45" class="grid-line"/>
+          <line x1="30" y1="75" x2="195" y2="75" class="grid-line"/>
+          <line x1="30" y1="105" x2="195" y2="105" class="grid-line"/>
+          <!-- Y labels -->
+          <text x="25" y="18" class="axis-label" text-anchor="end">20%</text>
+          <text x="25" y="48" class="axis-label" text-anchor="end">15%</text>
+          <text x="25" y="78" class="axis-label" text-anchor="end">10%</text>
+          <text x="25" y="108" class="axis-label" text-anchor="end">5%</text>
+          <!-- Target line at 15% (y=45) -->
+          <line x1="30" y1="45" x2="195" y2="45" stroke="#34d399" stroke-width="1" stroke-dasharray="4,3" opacity="0.6"/>
+          <text x="197" y="43" class="axis-label" fill="#34d399">Goal</text>
+          <!-- Transfer Rate line: data points scaled to 5%-20% range (y: 105 to 15, range 90px for 15pp) -->
+          <!-- wk10=8.2% → y=105-(3.2/15*90)=86, wk11=9.5→79, wk12=11→69, wk13=10.65→72, wk14=9.8→76, wk15=10.65→72 -->
+          <polyline points="45,86 75,79 105,69 135,72 165,76 185,72"
+            fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="45" cy="86" r="3" fill="#f59e0b"/>
+          <circle cx="75" cy="79" r="3" fill="#f59e0b"/>
+          <circle cx="105" cy="69" r="3" fill="#f59e0b"/>
+          <circle cx="135" cy="72" r="3" fill="#f59e0b"/>
+          <circle cx="165" cy="76" r="3" fill="#f59e0b"/>
+          <circle cx="185" cy="72" r="3.5" fill="#f59e0b" stroke="#181c27" stroke-width="1.5"/>
+          <!-- X labels -->
+          <text x="45" y="118" class="axis-label" text-anchor="middle">W10</text>
+          <text x="75" y="118" class="axis-label" text-anchor="middle">W11</text>
+          <text x="105" y="118" class="axis-label" text-anchor="middle">W12</text>
+          <text x="135" y="118" class="axis-label" text-anchor="middle">W13</text>
+          <text x="165" y="118" class="axis-label" text-anchor="middle">W14</text>
+          <text x="185" y="118" class="axis-label" text-anchor="middle">W15</text>
+        </svg>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
